@@ -1,0 +1,73 @@
+                            About This Filter
+
+    A bit of info on this filter: this is an unscented filter for
+      spacecraft attitude estimation, which keeps track of attitude
+      with a quaternion parameterization, and keeps track of attitude
+      error using a generalized three vector parameterization. The
+      authors Crassidis and Markley call it the unscented quaternion
+      estimator (USQUE). They tested it using 10 second measurement
+      periods over the course of hours; we plan on using it with ~100Hz
+      measurements over a few minutes.
+
+    It is possible that this filter is overkill for tracking a rocket.
+      Use of quaternions and processing large errors, the primary reason 
+      for using the nonlinear estimation properties of the unscented 
+      filter, might not be necessary for a rocket; for instance, gimbal
+      lock in a good Euler Angle parameterization could only occur if the
+      rocket literally turned to fly horizontally. Our initial
+      orientation (how the rocket is placed on the stand) is very simple,
+      and unlikely to contain errors, and the high sampling rate of the
+      sensors, along with the expected flight dynamics of the rocket,
+      mean that very large angular rate measurements are unlikely. For
+      small errors, Crassidis and Markley found that an Extended Kalman
+      Filter (EKF) agreed with this USQUE very closely. It is possible
+      that an EKF with an Euler angle parameterization, or even a
+      quaternion parameterization, would work quite well and use less
+      memory
+
+    However this filter has some advantages: it appears to work no worse
+      than the EKF for small errors, and better for large ones, the only
+      disadvantage being that it is computationally heavier. In Crassidis
+      and Markley's tests, it is also significantly better at correcting
+      large initial bias and covariance errors, which may come up for 
+      RPL, as finding the properties of our sensors accurately may be
+      difficult. So as long as we have the memory to run this filter, it
+      is a win-win.
+
+    Lastly, this filter would be perfect for satellites and orbital
+      spacecraft the way it is, and highly effective for interplantary 
+      spacecraft with sensors other than magnetometers. In contrast,
+      Apollo 13 used a gimbal parameterization, and gimbal lock was a
+      very annoying problem.
+
+---------------------------------------------------------------------------
+
+                            Using This Program
+
+    The runFilter program has many variables. The parameters of the
+        function may be varied to simulate the response of the filter to
+        different initial errors and orientations. The "Simulation
+        Parameters" near the top of the file may be varied to change sensor
+        simulation characteristics, spacecraft path characteristics, and
+        simulation times. Lastly, the "Constants" may be varied to fine
+        tune the filter performance, if you know what you are doing.
+    
+    Implementing this filter on a spacecraft requires estimating gyroscope
+        and magnetometer noise parameters. Look at Eq. (25) and (26). 
+        We are modeling the gyro measurement as the true angular rate, plus
+        a bias value, plus a noise value. Both the noise and changes in the
+        bias are their own Gaussian white noise processes. We should check 
+        the gyro documentation but it is unlikely to help.
+
+    If we can spin the gyro at an exact rate known to us (keeping it
+        perfectly still might work) then the average deviation of the
+        measurement from the actual rate for the first time steps will
+        roughly equal the gyro bias. If we repeat this many times, we
+        should get a good estimate for the typical initial bias.
+        Afterwards, we can compare the individual measurements to this to
+        find the noise standard devition. I am unsure how to find the bias
+        change standard deviation.
+
+    The paper says "Note that the actual magnetic field errors have 
+        systematic components, but these are not relevant to the present 
+        filter comparisons."
