@@ -12,6 +12,6 @@ function newQuat = gyroIntegrate(initialQ, gyroData, deltaTime)
     % deltaTime is a number
     
     deltaQuat = rotQuat(deltaTime*norm(gyroData), gyroData/norm(gyroData));
-    newQuat = kalmanArrayMult(initialQ,deltaQuat);
+    newQuat = multQuat(initialQ,deltaQuat);
 end
     

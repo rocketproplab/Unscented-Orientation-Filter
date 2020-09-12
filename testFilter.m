@@ -14,9 +14,8 @@ function [] = testFilter()
     attitudeQuat = [0;0;0;1];
     covariance = diag([0.25,0.25,0.25,0.04,0.04,0.04]);
     gyrobias = [0;0;0];
-    gyroDt = 10;
     
-    errorQuats = runFilter(attitudeQuat,covariance,gyrobias,gyroDt);
+    errorQuats = runFilter(attitudeQuat,covariance,gyrobias);
     
     % graph stuff in degrees for easy reading
     theta = zeros(1,size(errorQuats,2));

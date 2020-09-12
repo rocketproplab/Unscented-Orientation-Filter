@@ -38,6 +38,7 @@ function errorQuats = runFilter(attitudeQuat,covariance,gyrobias)
     
     % rotationTime is the time it takes for the spacecraft to complete a
     %   single rotation in seconds.
+    % A full rotation every 90 minutes
     rotationTime = 5400;
     
     

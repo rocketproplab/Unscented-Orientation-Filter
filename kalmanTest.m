@@ -27,11 +27,28 @@ verifyEqual(testCase,act,exp)
 end
 
 function testArrayMult(testCase)
-act = kalmanArrayMult([1;2;3;4]/(sqrt(30)),[5;7;11;13]/(sqrt(364)));
-exp = [34;58;80;0]/(sqrt(10920));
+act = kalmanArrayMult([2;3;5;7],[11;13;17;19]);
+exp = [101;169;207;-13];
 verifyEqual(testCase,act,exp)
 end
 
+function testArrayMult2(testCase)
+act = kalmanArrayMult2([2;3;5;7],[11;13;17;19]);
+exp = [101;169;207;-13];
+verifyEqual(testCase,act,exp)
+end
+
+function testMultQuat(testCase)
+act = multQuat([2;3;5;7],[11;13;17;19]);
+exp = [101;169;207;-13];
+verifyEqual(testCase,act,exp)
+end
+
+function testRotQuat(testCase)
+act = rotQuat(pi/3,([1,2,3]/(sqrt(14))));
+exp = ([1;2;3;0]/(2*sqrt(14))) + ([0;0;0;1]*(sqrt(3)/2));
+verifyEqual(testCase,act,exp,'RelTol',1e-12)
+end
 
 
 function testSigmaQuats(testCase)
