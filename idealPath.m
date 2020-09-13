@@ -1,8 +1,8 @@
-function [idealAngV,currentQuat] = idealPath(rotationTime,gyroDt)
+function [idealAngV,currentQuat] = idealPath(rotationTime,rotVec,gyroDt)
     %
     %
     % Keep rates in rad/s
-    idealAngV = (2*pi/(rotationTime*sqrt(3)))*[1;1;1]; % rad/s
+    idealAngV = (2*pi/(rotationTime*norm(rotVec)))*rotVec; % rad/s
     
     persistent orientationQuat
     if isempty(orientationQuat)

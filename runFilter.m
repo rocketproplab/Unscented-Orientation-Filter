@@ -42,6 +42,11 @@ function errorQuats = runFilter(attitudeQuat,covariance,gyrobias)
     rotationTime = 5400;
     
     
+    % rotVec is the vector around which the spacecraft rotates in the
+    %   simulation
+    rotVec = [1;1;1];
+    
+    
     % runTime is the length of our filter simulation in seconds.
     % On the spacecraft, the filter can run continuously.
     runTime = 32400;
@@ -112,7 +117,7 @@ function errorQuats = runFilter(attitudeQuat,covariance,gyrobias)
         % Generate the actual angular velocity of the rocket. Currently,
         %   always returns the same value, but you can make it dependent on
         %   i, the iteration number and thus point in time.
-        [idealAngV,currentQuat] = idealPath(rotationTime,gyroDt);
+        [idealAngV,currentQuat] = idealPath(rotationTime,rotVec,gyroDt);
         idealGyroVals(:,i) = idealAngV;
         
         % TODO: Get gyroMeas
