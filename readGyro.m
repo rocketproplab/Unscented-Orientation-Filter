@@ -29,7 +29,7 @@ function [gyroMeas] = readGyro(idealAngV)
     if isempty(bias)
         
         % calculate bias per time step, initialize it here
-        bias = (pi/6.48)*(1e-6)*[1;1;1]; % rad/s
+        bias = (pi/6.48)*(1e-5)*[1;1;1]; % rad/s
     end
     
     % Make sure that the standard deviation values are for time deltas

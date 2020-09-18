@@ -4,6 +4,8 @@ function quat = multQuat(q,p)
     % Multiplies two quaternions
     % q is a vector with 4 entries
     % p is a vector with 4 entries
+    % cosine term 4th
+    
     quat = [0;0;0;0];
     
     quat(4,1) = q(4)*p(4) - q(1)*p(1) - q(2)*p(2) - q(3)*p(3);

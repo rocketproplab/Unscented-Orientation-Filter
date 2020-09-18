@@ -44,7 +44,7 @@ function errorQuats = runFilter(attitudeQuat,covariance,gyrobias)
     
     % rotVec is the vector around which the spacecraft rotates in the
     %   simulation
-    rotVec = [1;1;1];
+    rotVec = [1;2;3];
     
     
     % runTime is the length of our filter simulation in seconds.

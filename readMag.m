@@ -22,10 +22,9 @@ function magMeas = readMag(currentQuat,F)
     
     noise = mag_sd*randn(3,1);
     
-    idealMagMeas = kalmanArrayMult(kalmanArrayMult(currentQuat,[F;0]),...
-        kalmanArrayInv(currentQuat));
+    idealMagMeas = quatRotate(currentQuat,F);
     
-    magMeas = idealMagMeas(1:3,1) + noise;
+    magMeas = idealMagMeas + noise;
 end
     
     
