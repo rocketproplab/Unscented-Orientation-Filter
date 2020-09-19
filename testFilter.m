@@ -33,10 +33,10 @@ function [] = testFilter()
         %v1theta(1,i) = abs(v1err(4,i));
     end
     
-    %plot(t,v2theta);
+    plot(t,v2theta);
     hold on
     plot(t,v1theta);
-    %legend('justQuats','USQUE');
+    legend('justQuats','USQUE');
     
     clear;
 end

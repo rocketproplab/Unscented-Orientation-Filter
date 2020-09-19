@@ -9,6 +9,6 @@ function quat = kalmanArrayMult(q,p)
     
     Eps = [p(4,1)*eye(3)+crossMatrix(p(1:3,1)); -(p(1:3,1))'];
     
-%    quat = [Eps, p]*q;
-    quat = multQuat(q,p);
+    quat = [Eps, p]*q;
+%    quat = multQuat(q,p);
 end

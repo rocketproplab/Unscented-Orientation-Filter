@@ -5,16 +5,17 @@ function [qK,chiBias] = sigmaQuats(lambda,PplusK,QbarK,stateV,a,f, ...
     % Generate sigma vectors from +- the Cholesky decomposition of a 
     %   weighted sum of the postupdate covariance and a process noise 
     %   related covariance.
-    Sigma = chol((6+lambda)*(PplusK + QbarK));
-    Sigma = [Sigma, -Sigma];
+    Sigma = zeros(6,2*n+1);
+    (6+lambda)*(PplusK + QbarK)
+    Sigma(:,1:n) = chol((6+lambda)*(PplusK + QbarK));
+    Sigma(:,(n+1):(2*n)) = -Sigma(:,1:n);
     
     % Eq. (5)b,c
     % Find Chi vectors, by adding the estimated postupdate state to each 
     %   sigma vector. 
     % These Chi vectors are basically error vectors, all of which together 
     %   have the distribution described by PlusK and QbarK
-    Chi = Sigma + repmat(stateV,1,2*n);
-    Chi = [Chi,stateV];
+    Chi = Sigma + repmat(stateV,1,2*n+1);
     
     
     % Return the bottom three components of each Chi vector, as the bias

@@ -9,6 +9,8 @@ function omegaK = sigmaOmegas(gyroMeas,meanPlus,chiBias,n)
         omegaK(:,i) = gyroMeas-chiBias(:,i);
     end
     
+    chiBias(:,2*n+1)
+    meanPlus(4:6,1)
     % Add the omegaK(0) three vector to the end of the array. The omegaK
     %   array now has 13 columns.
     omegaK(:,2*n+1) = gyroMeas - meanPlus(4:6,1);

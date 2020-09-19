@@ -157,7 +157,7 @@ function [v2errorQuats,v1err] = runFilter(attitudeQuat,covariance,gyrobias)
         % Eq. (35)
         % Create a distribution of possible angular velocities, 
         %   corresponding to different possible gyro bias values.
-        omegaK = sigmaOmegas(gyroMeas,meanPlus,chiBias,n);
+        EstAngV = sigmaOmegas(gyroMeas,meanPlus,chiBias,n);
         
         % TODO: Consider storing omegaK(0), since this is the best estimate
         %   of the rocket's angular velocity.
@@ -166,7 +166,7 @@ function [v2errorQuats,v1err] = runFilter(attitudeQuat,covariance,gyrobias)
         % Eq. (34)
         % Propogate the 13 qK sigma quaternions using the 13 angular 
         %   velocities to get 13 qK1 propagated sigma quaternions.
-        qK1 = quatPropagate(qK,omegaK,gyroDt);
+        qK1 = quatPropagate(qK,EstAngV,gyroDt,n);
         
         
         % Eq.s (36), (37), and (38)
@@ -256,6 +256,7 @@ function [v2errorQuats,v1err] = runFilter(attitudeQuat,covariance,gyrobias)
         % Reset the first three components of meanPlus to zero 
         %   for the next propagation.
         meanPlus = resetMean(meanPlus);
+        
     end
     
     % Save vector and quaternion arrays to xls file

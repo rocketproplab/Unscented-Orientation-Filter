@@ -1,4 +1,4 @@
-function NewQuats = quatPropagate(OldQuats,EstAngV,dt)
+function NewQuats = quatPropagate(OldQuats,EstAngV,gyroDt,n)
     %
     % function quatPropogate
     % OldQuats is the array of pre-propogation sigma
@@ -8,14 +8,15 @@ function NewQuats = quatPropagate(OldQuats,EstAngV,dt)
     % dt is the sampling interval in the gyro
     % NewQuats is the array of propogated sigma quaternions
     
-    NewQuats = zeros(4,size(EstAngV,2));
-    for i=1:size(EstAngV,2)
+    NewQuats = zeros(4,2*n+1);
+    for i=1:(2*n+1)
         
         % Eq. (29)
-        psiK = ((sin(0.5*norm(EstAngV(:,i))*dt))*EstAngV(:,i))/...
+        psiK = ((sin(0.5*norm(EstAngV(:,i))*gyroDt))*EstAngV(:,i))/...
                 norm(EstAngV(:,i));
-        Omega = [cos(0.5*norm(EstAngV(:,i))*dt)*eye(3)-crossMatrix(...
-            psiK), psiK; -psiK', cos(0.5*norm(EstAngV(:,i))*dt)];
+        Omega = [cos(0.5*norm(EstAngV(:,i))*gyroDt)*eye(3)-crossMatrix(...
+            psiK), psiK; -transpose(psiK), ...
+            cos(0.5*norm(EstAngV(:,i))*gyroDt)];
         
         NewQuats(:,i) = Omega*OldQuats(:,i);
     end
