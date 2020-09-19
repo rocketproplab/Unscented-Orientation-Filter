@@ -15,17 +15,28 @@ function [] = testFilter()
     covariance = diag([0.25,0.25,0.25,0.04,0.04,0.04]);
     gyrobias = [0;0;0];
     
-    errorQuats = runFilter(attitudeQuat,covariance,gyrobias);
+    [v2errorQuats,v1err] = runFilter(attitudeQuat,covariance,gyrobias);
     
     % graph stuff in degrees for easy reading
-    theta = zeros(1,size(errorQuats,2));
-    t = zeros(1,size(errorQuats,2));
-    for i=1:size(errorQuats,2)
+    v2theta = zeros(1,size(v2errorQuats,2));
+    t = zeros(1,size(v2errorQuats,2));
+    for i=1:size(v2errorQuats,2)
         t(1,i) = 10*(i-1);
-        theta(1,i) = 2*atand(norm(errorQuats(1:3,i))/errorQuats(4,i));
-        %theta(1,i) = abs(errorQuats(4,i));
+        v2theta(1,i) = 2*atand(norm(v2errorQuats(1:3,i))/v2errorQuats(4,i));
+        %v2theta(1,i) = abs(v2errorQuats(4,i));
     end
-    plot(t,theta);
+    
+    v1theta = zeros(1,size(v1err,2));
+    for i=1:size(v1err,2)
+        t(1,i) = 10*(i-1);
+        v1theta(1,i) = 2*atand(norm(v1err(1:3,i))/v1err(4,i));
+        %v1theta(1,i) = abs(v1err(4,i));
+    end
+    
+    %plot(t,v2theta);
+    hold on
+    plot(t,v1theta);
+    %legend('justQuats','USQUE');
     
     clear;
 end

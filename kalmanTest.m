@@ -41,12 +41,14 @@ end
 function testArrayInv(testCase)
 a = [2;3;5;7];
 b = kalmanArrayInv(a);
-verifyEqual(testCase,multQuat(a,b),[0;0;0;1])
+verifyEqual(testCase,multQuat(a,b),[0;0;0;1],'AbsTol',1e-12)
 end
 
 function testArrayMult(testCase)
-act = kalmanArrayMult([2;3;5;7],[11;13;17;19]);
-exp = [101;169;207;-13];
+act = kalmanArrayMult([2;3;5;7]/sqrt(87),[11;13;17;19]/sqrt(940));
+% exp = [101;169;207;-13];
+exp = multQuat([2;3;5;7]/sqrt(87),[11;13;17;19]/sqrt(940));
+% exp = multQuat(multQuat([11;13;17;19],[2;3;5;7]),invQuat([11;13;17;19]));
 verifyEqual(testCase,act,exp)
 end
 

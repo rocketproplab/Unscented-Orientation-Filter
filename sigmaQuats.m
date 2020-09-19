@@ -5,7 +5,7 @@ function [qK,chiBias] = sigmaQuats(lambda,PplusK,QbarK,stateV,a,f, ...
     % Generate sigma vectors from +- the Cholesky decomposition of a 
     %   weighted sum of the postupdate covariance and a process noise 
     %   related covariance.
-    Sigma = transpose(chol((6+lambda)*(PplusK + QbarK)));
+    Sigma = chol((6+lambda)*(PplusK + QbarK));
     Sigma = [Sigma, -Sigma];
     
     % Eq. (5)b,c
@@ -42,7 +42,7 @@ function [qK,chiBias] = sigmaQuats(lambda,PplusK,QbarK,stateV,a,f, ...
     % Do this by multiplying by the state quaternion
     % Together, these represent the distribution of likely orientation
     %   quaternions
-    qK = zeros(4,2*n);
+    qK = zeros(4,2*n+1);
     for i=1:(2*n)
         qK(:,i) = kalmanArrayMult(dqK(:,i),attitudeQuat);
     end
