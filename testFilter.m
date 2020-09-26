@@ -14,7 +14,10 @@ function [] = testFilter()
     clear functions;
     clf;
     attitudeQuat = [0;0;0;1];
-    covariance = diag([0.25,0.25,0.25,0.04,0.04,0.04]);
+    att_err = (pi/360)^2;
+    bias_err = (pi/(3.24e6))^2;
+    covariance = diag([att_err,att_err,att_err,bias_err,bias_err,...
+        bias_err]);
     gyrobias = (pi/6.48)*(1e-5)*[1;1;1];
     
     [v2errorQuats,v1err] = runFilter(attitudeQuat,covariance,gyrobias);
