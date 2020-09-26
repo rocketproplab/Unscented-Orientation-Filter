@@ -9,8 +9,10 @@ function [idealAngV,currentQuat] = idealPath(rotationTime,rotVec,gyroDt)
         % The true orientation is different from the estimated orientation,
         %   if errors to the initial estimate are introduced for testing.
         orientationQuat = [0;0;0;1];
+        % currentQuat = orientationQuat;
+        % return;
     end
     orientationQuat = gyroIntegrate(orientationQuat,idealAngV,gyroDt);
     
-    currentQuat = orientationQuat;
+    currentQuat = orientationQuat
 end

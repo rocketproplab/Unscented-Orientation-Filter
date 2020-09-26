@@ -11,9 +11,11 @@ function [] = testFilter()
     %   of last initial attitude covariance, attitude covariance likewise
     %   roughlt halfs of last initial attitude covariance.
     %
+    clear functions;
+    clf;
     attitudeQuat = [0;0;0;1];
     covariance = diag([0.25,0.25,0.25,0.04,0.04,0.04]);
-    gyrobias = [0;0;0];
+    gyrobias = (pi/6.48)*(1e-5)*[1;1;1];
     
     [v2errorQuats,v1err] = runFilter(attitudeQuat,covariance,gyrobias);
     
@@ -28,17 +30,14 @@ function [] = testFilter()
     
     v1theta = zeros(1,size(v1err,2));
     for i=1:size(v1err,2)
-        t(1,i) = 10*(i-1);
         v1theta(1,i) = 2*atand(norm(v1err(1:3,i))/v1err(4,i));
         %v1theta(1,i) = abs(v1err(4,i));
     end
     
-    %plot(t,v2theta);
+    plot(t,v2theta);
     hold on
     plot(t,v1theta);
-    %legend('justQuats','USQUE');
-    
-    clear;
+    legend('USQUE','justQuats');
 end
     
         

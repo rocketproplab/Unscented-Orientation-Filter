@@ -22,7 +22,13 @@ function magMeas = readMag(currentQuat,F)
     
     noise = mag_sd*randn(3,1);
     
-    idealMagMeas = quatRotate(currentQuat,F);
+    % rotate from the worl frame into the sensor frame
+    % do the inverse of quatRotate
+    worldQuat = [F; 0];
+    
+    idealMagMeas = multQuat(multQuat(invQuat(currentQuat),...
+        worldQuat), currentQuat);
+    idealMagMeas = idealMagMeas(1:3,1);
     
     magMeas = idealMagMeas + noise;
 end

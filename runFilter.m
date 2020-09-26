@@ -44,7 +44,7 @@ function [v2errorQuats,v1err] = runFilter(attitudeQuat,covariance,gyrobias)
     
     % rotVec is the vector around which the spacecraft rotates in the
     %   simulation
-    rotVec = [1;2;3];
+    rotVec = [1;1;1];
     
     
     % runTime is the length of our filter simulation in seconds.
@@ -56,15 +56,15 @@ function [v2errorQuats,v1err] = runFilter(attitudeQuat,covariance,gyrobias)
     gyroDt = 10;
     
     
-    % sigma_u is the gyro bias standard deviation in rad per s^(3/2).
+    % estimated gyro bias standard deviation in rad per s^(3/2).
     sigma_u = 3.1623e-10;
     
     
-    % sigma_v is the gyro noise standard deviation in rad per s^(1/2).
+    % estimated gyro noise standard deviation in rad per s^(1/2).
     sigma_v = 0.31623e-6;
     
     
-    % mag_sd is the magnetometer noise standard deviation in Tesla.
+    % estimated magnetometer noise standard deviation in Tesla.
     mag_sd = 50e-9;
     
     
@@ -87,7 +87,7 @@ function [v2errorQuats,v1err] = runFilter(attitudeQuat,covariance,gyrobias)
     
     
     % The number of filter iterations for this simulation.
-    iterations = runTime/gyroDt;
+    iterations = round(runTime/gyroDt);
     
     
     % initialize state vector (the postupdate mean error)
@@ -101,6 +101,7 @@ function [v2errorQuats,v1err] = runFilter(attitudeQuat,covariance,gyrobias)
      
     % Declare arrays for gyroMeas and magMeas, to record the values for a
     % simulation, so the simulation can be rerun.
+    v1 = attitudeQuat;
     gyroVals = zeros(3,iterations);
     magVals = zeros(3,iterations);
     idealGyroVals = zeros(3,iterations);
@@ -132,8 +133,7 @@ function [v2errorQuats,v1err] = runFilter(attitudeQuat,covariance,gyrobias)
         magVals(:,i) = magMeas;
         
         % Get orientation tracking version 1 results
-        v1 = gyroIntegrate(attitudeQuat,gyroMeas,gyroDt);
-        
+        v1 = gyroIntegrate(v1,gyroMeas,gyroDt);
         
         %% Propagation Step
         % Eq.s (5),(33),(32)
