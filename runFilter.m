@@ -1,4 +1,4 @@
-function [v2errorQuats,v1err] = runFilter(attitudeQuat,covariance,gyrobias)
+function [v2errQs,v1errQs] = runFilter(attitudeQuat,covariance,gyrobias)
     %% Information
     %
     % runFilter(attitudeQuat,covariance,gyrobias)
@@ -105,8 +105,8 @@ function [v2errorQuats,v1err] = runFilter(attitudeQuat,covariance,gyrobias)
     gyroVals = zeros(3,iterations);
     magVals = zeros(3,iterations);
     idealGyroVals = zeros(3,iterations);
-    v2errorQuats = zeros(4,iterations);
-    v1err = zeros(4,iterations);
+    v2errQs = zeros(4,iterations);
+    v1errQs = zeros(4,iterations);
     
     %% Filter Loop
     % The code above gets the initial attitudeQuat and covariance, but 
@@ -247,10 +247,10 @@ function [v2errorQuats,v1err] = runFilter(attitudeQuat,covariance,gyrobias)
         % Find an error quaternion, which, if multiplied by attitudeQuat on
         %   the right, returns the actual ideal orientation quaternion of
         %   the rocket. Store this for each loop iteration.
-        v2errorQuats(:,i) = kalmanArrayMult(currentQuat,kalmanArrayInv(...
+        v2errQs(:,i) = kalmanArrayMult(currentQuat,kalmanArrayInv(...
             attitudeQuat));
         % orientation version 1 errors
-        v1err(:,i) = kalmanArrayMult(currentQuat,kalmanArrayInv(v1));
+        v1errQs(:,i) = kalmanArrayMult(currentQuat,kalmanArrayInv(v1));
         
         % Instruction immediately after Eq. (45b)
         % Reset the first three components of meanPlus to zero 

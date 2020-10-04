@@ -8,8 +8,9 @@ function PK1vv = innovationCov(gammaK1,yK1,lambda,mag_sd,n)
 	% Eq. (11) concluding step
 	% If only the magnetometer is in use for measurement, PK1yy is a 
 	%   3x3 matrix.
-	PK1yy = (lambda*P_in2(:,2*n+1)*(P_in2(:,2*n+1)') + ...
-        0.5*sum((P_in2(:,1:(2*n))*(P_in2(:,1:(2*n))')),2))/(n+lambda);
+	PK1yy = (lambda*P_in2(:,2*n+1)*transpose(P_in2(:,2*n+1)) + ...
+        0.5*sum((P_in2(:,1:(2*n))*transpose(P_in2(:,1:(2*n)))),2))/...
+        (n+lambda);
         
         
 	% TODO: Figure out how to find the standard deviation for the 

@@ -7,7 +7,7 @@ function [meanPlus,covariance] = updateError(magMeas,yK1,PK1xy,PK1vv,...
         
 	% Eq. (4)
 	% Find the gain
-	KK1 = PK1xy;%/inv(1e14*(PK1vv));
+	KK1 = PK1xy/inv(1e14(PK1vv);
         
 	% Eq. (2a)
 	% Find the updated, propagated state (mean error vector)

@@ -12,35 +12,48 @@ function [] = testFilter()
     %   roughlt halfs of last initial attitude covariance.
     %
     clear functions;
-    clf;
+    
+    % Define initial attitude estimate (actual attitude in idealPath)
     attitudeQuat = [0;0;0;1];
+    
+    % Define attitude error and bias error components of covariance
     att_err = (pi/360)^2;
     bias_err = (pi/(3.24e6))^2;
     covariance = diag([att_err,att_err,att_err,bias_err,bias_err,...
         bias_err]);
-    gyrobias = (pi/6.48)*(1e-5)*[1;1;1];
     
-    [v2errorQuats,v1err] = runFilter(attitudeQuat,covariance,gyrobias);
+    % Define gyro bias estimate
+    gyrobias = [0;0;0];
+    
+    % Run Simulation
+    [v2errQs,v1errQs] = runFilter(attitudeQuat,covariance,gyrobias);
     
     % graph stuff in degrees for easy reading
-    v2theta = zeros(1,size(v2errorQuats,2));
-    t = zeros(1,size(v2errorQuats,2));
-    for i=1:size(v2errorQuats,2)
-        t(1,i) = 10*(i-1);
-        v2theta(1,i) = 2*atand(norm(v2errorQuats(1:3,i))/v2errorQuats(4,i));
-        %v2theta(1,i) = abs(v2errorQuats(4,i));
-    end
-    
-    v1theta = zeros(1,size(v1err,2));
-    for i=1:size(v1err,2)
-        v1theta(1,i) = 2*atand(norm(v1err(1:3,i))/v1err(4,i));
+    v1theta = zeros(1,size(v1errQs,2));
+    for i=1:size(v1errQs,2)
+        v1theta(1,i) = 2*atand(norm(v1errQs(1:3,i))/v1errQs(4,i));
         %v1theta(1,i) = abs(v1err(4,i));
     end
     
-    plot(t,v2theta);
-    hold on
+    % graph stuff in degrees for easy reading
+    v2theta = zeros(1,size(v2errQs,2));
+    for i=1:size(v2errQs,2)
+        v2theta(1,i) = 2*atand(norm(v2errQs(1:3,i))/v2errQs(4,i));
+        %v2theta(1,i) = abs(v2errorQuats(4,i));
+    end
+    
+    % time
+    iter = max(size(v1errQs,2),size(v2errQs,2));
+    t = linspace(1,10*iter,iter);
+    
+    figure;
     plot(t,v1theta);
-    legend('USQUE','justQuats');
+    title('Naive Integration');
+    %hold on
+    figure;
+    plot(t,v2theta);
+    title('USQUE');
+    %legend('justQuats','USQUE');
 end
     
         

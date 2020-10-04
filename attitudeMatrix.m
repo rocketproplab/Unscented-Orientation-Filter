@@ -9,5 +9,5 @@ function Aq = attitudeMatrix(quat)
     Psi = [quat(4,1)*eye(3)-crossMatrix(quat(1:3,1)); -(quat(1:3,1))'];
     
     % Eq.  (15)
-    Aq = Eps'*Psi;
+    Aq = transpose(Eps)*Psi;
 end
