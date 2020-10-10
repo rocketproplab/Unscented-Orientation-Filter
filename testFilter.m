@@ -23,7 +23,7 @@ function [] = testFilter()
         bias_err]);
     
     % Define gyro bias estimate
-    gyrobias = [0;0;0];
+    gyrobias = (pi/6.48)*(1e-5)*[1;1;1];
     
     % Run Simulation
     [v2errQs,v1errQs] = runFilter(attitudeQuat,covariance,gyrobias);
