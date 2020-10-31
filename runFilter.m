@@ -213,12 +213,12 @@ function [v2errQs,v1errQs] = runFilter(attitudeQuat,covariance,gyrobias)
         %   covariance, using the expected measurements and magnetometer
         %   variance, respectively. Use these to find the innovation
         %   covariance.
-        PK1vv = innovationCov(gammaK1,yK1,lambda,mag_sd,n);
+        PK1vv = innovationCov2(gammaK1,yK1,lambda,mag_sd,n);
         
         
         % Eq. (13)
         % Find the cross-correlation matrix
-        PK1xy = crossCorr(ChiK1,meanMinus,gammaK1,yK1,lambda,n);
+        PK1xy = crossCorr2(ChiK1,meanMinus,gammaK1,yK1,lambda,n);
         
         
         %% Update Step

@@ -10,7 +10,7 @@ function [meanMinus,PminusK1] = predictError(lambda,ChiK1,QbarK,n)
     P_in = ChiK1(:,1:(2*n)) - repmat(meanMinus,1,2*n);
         
     PminusK1 = (lambda*(ChiK1(:,2*n+1)-meanMinus)* ...
-        ((ChiK1(:,2*n+1)-meanMinus)') ...
-        + 0.5*P_in*(P_in'))/(n+lambda) + QbarK;
+        (transpose(ChiK1(:,2*n+1)-meanMinus)) ...
+        + 0.5*P_in*transpose(P_in))/(n+lambda) + QbarK;
 end
         

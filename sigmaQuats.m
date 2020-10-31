@@ -5,7 +5,7 @@ function [qK,chiBias] = sigmaQuats(lambda,PplusK,QbarK,stateV,a,f, ...
     % Generate sigma vectors from +- the Cholesky decomposition of a 
     %   weighted sum of the postupdate covariance and a process noise 
     %   related covariance.
-    Sigma = chol((6+lambda)*(PplusK + QbarK));
+    Sigma = transpose(chol((6+lambda)*(PplusK + QbarK)));
     Sigma = [Sigma, -Sigma];
     
     % Eq. (5)b,c
