@@ -1,13 +1,29 @@
-function PK1xy = crossCorr2(ChiK1,meanMinus,gammaK1,yK1,lambda,n)
+function newCrossCorrelation = crossCorr2(possNewError,predError,...
+    possExpMagMeas,predMagMeas,lambda,n)
     %
+    % crossCorr2(possNewError,predError,possExpMagMeas,predMagMeas,...
+    %   lambda,n)
+    % 
+    % finds the error to measurement cross correlation
+    % Parameters:
+    % predError is the predicted gyro error vector
+    % possNewError are the possible new attitude error vectors
+    % possExpMagMeas is the distribution of possible mag measurements based
+    %   on the magnetic field at this location
+    % predMagMeas is the predicted magnetometer measurement at the location
+    % lambda and n are constants
+    %
+    % Result:
+    % newCrossCorrelation is the correlation between error and measurement
+    
     % following paper exactly
-    CovSum = lambda*(ChiK1(:,2*n+1) - meanMinus)*transpose(...
-        gammaK1(:,2*n+1) - yK1);
+    CovSum = lambda*(possNewError(:,2*n+1) - predError)*transpose(...
+        possExpMagMeas(:,2*n+1) - predMagMeas);
     
     for i = 1:(2*n)
-        CovSum = CovSum + (ChiK1(:,i) - meanMinus)*transpose(...
-            gammaK1(:,i) - yK1)/2;
+        CovSum = CovSum + (possNewError(:,i) - predError)*transpose(...
+            possExpMagMeas(:,i) - predMagMeas)/2;
     end
     
-    PK1xy = CovSum/(n+lambda);
+    newCrossCorrelation = CovSum/(n+lambda);
 end

@@ -1,29 +1,31 @@
 function [gyroMeas] = readGyro(idealAngV)
     % 
-    % readGyro
+    % readGyro(idealAngV)
     %
-    % This function is intended to simulate gyro measurements, and is used
-    %   to test the filter. In the Crassidis and Markley simulations, the
-    %   gyro is modeled as having:
-    sigma_bias = 3.1623e-10; % radians per (3/2) second,
-    % sigma_bias = 0.018119*1e-6; % degrees per (3/2) second,
+    % This function is simulates gyro measurements, with noise and bias,
+    %   given the true angular velocity of the spacecraft.
+    %
+    % Parameters:
+    % idealAngV is the true angular velocity of the spacecraft
+    %
+    % Results:
+    % gyroMeas is the simulated gyroscope measurement
     
-    sigma_noise = 0.31623e-6; % radians per (1/2) second,
-    % sigma_noise = 18.119*1e-6; % degrees per (1/2) second
     
-    % and an initial bias of 0.1 degrees per hour on each axis.
+    % True gyro bias standard deviation in radians per second^(3/2)
+    sigma_bias = 3.1623e-10;
+    
+    % True gyro noise standard deviation in radians per second^(1/2)
+    sigma_noise = 0.31623e-6;
+    
+    
     % The bias is updated with a zero mean Gaussian white-noise process
     %   with standard deviation equal to sigma_bias
     % Besides bias, the gyro measurements also have zero mean Gaussian 
     %   white-noise added, with standard deviation equal to sigma_noise
     
-    % For an 9 hour simulation, with measurements every 10 seconds,
-    %   generate 3240 simulated measurements.
-    % Assume the spacecraft makes a full rotation and a full orbit every 90
-    %   minutes. Then the spacecraft makes 6 full rotations in this
-    %   simulation.
     
-    % DO STUFF IN RADIANS
+    % DO STUFF IN RADIANS AND SECONDS
     
     persistent bias
     if isempty(bias)

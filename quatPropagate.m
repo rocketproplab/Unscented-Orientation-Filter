@@ -1,22 +1,28 @@
-function NewQuats = quatPropagate(OldQuats,EstAngV,dt)
+function possNewQuats = quatPropagate(possQuats,possAngV,gyroDt)
     %
-    % function quatPropogate
-    % OldQuats is the array of pre-propogation sigma
+    % quatPropogate(possQuats,possAngV,gyroDt)
+    % finds the possible orientations of the spacecraft after the possible
+    %   rotations of the spacecraft
+    %
+    % Parameters:
+    % possQuats is the array of pre-propogation sigma
     %   quaternions
-    % EstAngV is the array of estimated sigma angular
+    % possAngV is the array of estimated sigma angular
     %   velocities (measured minus Chi bias sigma vectors)
-    % dt is the sampling interval in the gyro
-    % NewQuats is the array of propogated sigma quaternions
+    % gyroDt is the sampling interval in the gyro
+    %
+    % Results:
+    % possNewQuats is the array of propagated sigma quaternions
     
-    NewQuats = zeros(4,size(EstAngV,2));
-    for i=1:size(EstAngV,2)
+    possNewQuats = zeros(4,size(possAngV,2));
+    for i=1:size(possAngV,2)
         
         % Eq. (29)
-        psiK = ((sin(0.5*norm(EstAngV(:,i))*dt))*EstAngV(:,i))/...
-                norm(EstAngV(:,i));
-        Omega = [cos(0.5*norm(EstAngV(:,i))*dt)*eye(3)-crossMatrix(...
-            psiK), psiK; -psiK', cos(0.5*norm(EstAngV(:,i))*dt)];
+        psiK = ((sin(0.5*norm(possAngV(:,i))*gyroDt))*possAngV(:,i))/...
+                norm(possAngV(:,i));
+        Omega = [cos(0.5*norm(possAngV(:,i))*gyroDt)*eye(3)-crossMatrix(...
+            psiK), psiK; -psiK', cos(0.5*norm(possAngV(:,i))*gyroDt)];
         
-        NewQuats(:,i) = Omega*OldQuats(:,i);
+        possNewQuats(:,i) = Omega*possQuats(:,i);
     end
 end

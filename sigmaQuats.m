@@ -1,11 +1,27 @@
-function [qK,chiBias] = sigmaQuats(lambda,PplusK,QbarK,stateV,a,f, ...
-    attitudeQuat,n)
+function [possQuats,possBias] = sigmaQuats(lambda,covariance,noiseCov,...
+    error,a,f,attitudeQuat,n)
+
+    % sigmaQuats(lambda,ovariance,noiseCov,error,a,f,attitudeQuat,n)
+    %
+    % This function find possible orientation quaternions from the best
+    %   estimate of the last filter iteration, and the covariances.
+    %
+    % Parameters:
+    % lambda, a, and f are fine tuning values
+    % covariance and noiseCov are PplusK and QbarK in the research paper
+    % error is a angular velocity error estimate from the last iteration
+    %
+    % Results:
+    % possQuats are possible current orientation quaternions (before the
+    %   most recent rotation). They represent the distribution of possible
+    %   orientations.
+    % possBias are possible bias values of the gyroscope
 
     % Eq. (5)a 
     % Generate sigma vectors from +- the Cholesky decomposition of a 
     %   weighted sum of the postupdate covariance and a process noise 
     %   related covariance.
-    Sigma = transpose(chol((6+lambda)*(PplusK + QbarK)));
+    Sigma = transpose(chol((6+lambda)*(covariance + noiseCov)));
     Sigma = [Sigma, -Sigma];
     
     % Eq. (5)b,c
@@ -13,15 +29,15 @@ function [qK,chiBias] = sigmaQuats(lambda,PplusK,QbarK,stateV,a,f, ...
     %   sigma vector. 
     % These Chi vectors are basically error vectors, all of which together 
     %   have the distribution described by PlusK and QbarK
-    Chi = Sigma + repmat(stateV,1,2*n);
-    Chi = [Chi,stateV];
+    Chi = Sigma + repmat(error,1,2*n);
+    Chi = [Chi,error];
     
     
     % Return the bottom three components of each Chi vector, as the bias
     %   component. This component does not change between propogations, and
     %   will be used in Eq. (35) in sigmaOmegas, and in Eq. (38) in the
     %   newChis() function.
-    chiBias = Chi(4:6,:);
+    possBias = Chi(4:6,:);
     
     
     % Eq. (33)
@@ -42,13 +58,13 @@ function [qK,chiBias] = sigmaQuats(lambda,PplusK,QbarK,stateV,a,f, ...
     % Do this by multiplying by the state quaternion
     % Together, these represent the distribution of likely orientation
     %   quaternions
-    qK = zeros(4,2*n+1);
+    possQuats = zeros(4,2*n+1);
     for i=1:(2*n)
-        qK(:,i) = kalmanArrayMult(dqK(:,i),attitudeQuat);
+        possQuats(:,i) = kalmanArrayMult(dqK(:,i),attitudeQuat);
     end
     
     % Add the qK(0) quaternion, equal to the current quaternion estimate,
     %   to the end of the array. The qK array now has 13 columns.
-    qK(:,2*n+1) = attitudeQuat;
+    possQuats(:,2*n+1) = attitudeQuat;
 end
     

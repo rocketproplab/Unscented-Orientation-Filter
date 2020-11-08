@@ -1,23 +1,35 @@
-function [v2errQs,v1errQs] = runFilter(attitudeQuat,covariance,gyrobias)
+function [v2errQuats,v1errQuats] = runFilter(attitudeQuat,covariance,gyrobias)
     %% Information
     %
     % runFilter(attitudeQuat,covariance,gyrobias)
-    % by Matthew Mikhailov, based on Crassidis and Markley
+    % by Matthew Mikhailov, based on research by Crassidis and Markley
     %
-    % Initializes the Kalman filter
+    % Runs the Unscented Quaternion Estimator (USQUE) on simulated gyro and
+    %   magnetometer data. Also runs naive quaternion integration on the
+    %   data so that you can compare performance.
+    %
+    % Parameters:
     % attitudeQuat is the initial attitude quaternion
     %   - four vector with cos term 4th
     % covariance is a 6x6 matrix
     %   - it has attitude error elements and bias error elements. I believe
     %       is a diagonal matrix
-    %   - figure out how to find initial attitude and covariance. Try to 
-    %       find a math relationship between sd and cov.
+    %   - figure out how to find initial attitude and covariance.
     % gyrobias is a three vector gyro bias estimate currently in deg/h
     %
+    % Returns:
+    % v2errQs is an array of error quaternions, one column for each filter
+    %   iteration, representing the quaternion necessary to rotate the
+    %   orientation estimated by USQUE (version 2 of the orientation 
+    %   tracking) onto the ideal orientation quaternion.
+    % v1errQs is an array like v2errQs, only it represents the error
+    %   from using naive quaternion integration (version 1 of orientation
+    %   tracking), instead of USQUE, on the simulated data. 
     %
-    % This is an unscented filter for spacecraft attitude estimation, which
-    %   keeps track of attitude with a quaternion parameterization, and 
-    %   keeps track of attitude error using a generalized three vector 
+    %
+    % USQUE is an unscented filter for spacecraft attitude estimation, 
+    %   which keeps track of attitude with a quaternion parameterization, 
+    %   and keeps track of attitude error using a generalized three vector 
     %   parameterization. The authors Crassidis and Markley call it the 
     %   unscented quaternion estimator (USQUE). They tested it using 10 
     %   second measurement periods over the course of hours; we plan on 
@@ -25,8 +37,9 @@ function [v2errQs,v1errQs] = runFilter(attitudeQuat,covariance,gyrobias)
     % See description.txt for more information.
     
    
-    % TODO: Check units, in particular time units, for all constants and
-    %   functions.
+    % Remember to check units, in particular time units, for all constants 
+    %   and functions. Crassidis runs all his filters in radians and 
+    %   seconds.
     
     
     %% Simulation Parameters
@@ -42,9 +55,9 @@ function [v2errQs,v1errQs] = runFilter(attitudeQuat,covariance,gyrobias)
     rotationTime = 5400;
     
     
-    % rotVec is the vector around which the spacecraft rotates in the
+    % rotationVec is the vector around which the spacecraft rotates in the
     %   simulation
-    rotVec = [1;2;3];
+    rotationVec = [1;2;3];
     
     
     % runTime is the length of our filter simulation in seconds.
@@ -57,21 +70,22 @@ function [v2errQs,v1errQs] = runFilter(attitudeQuat,covariance,gyrobias)
     
     
     % estimated gyro bias standard deviation in rad per s^(3/2).
-    sigma_u = 3.1623e-10;
+    sigma_bias = 3.1623e-10;
     
     
     % estimated gyro noise standard deviation in rad per s^(1/2).
-    sigma_v = 0.31623e-6;
+    sigma_noise = 0.31623e-6;
     
     
     % estimated magnetometer noise standard deviation in Tesla.
-    mag_sd = 50e-9;
+    sigma_mag = 50e-9;
     
     
     %% Constants and Fine-Tuning
     
     
-    % Parameters for fine-tuning filter.
+    % Parameters for fine-tuning filter. Crassidis and Markley recommmend
+    %   a=1,lambda=1
     % Try (a,lambda) values (1,1), (1,0), (1,-1), and (2,-1)
     a = 1;          % a is a gRp parameter 0<=a<=1
     lambda = 1;     % lambda is a sigma point generation parameter
@@ -91,23 +105,23 @@ function [v2errQs,v1errQs] = runFilter(attitudeQuat,covariance,gyrobias)
     
     
     % initialize state vector (the postupdate mean error)
-    meanPlus = [0;0;0;gyrobias];   
+    error = [0;0;0;gyrobias];   
     
     
     % Eq. (42)
-    % QbarK is only based on the gyro bias and noise properties and
+    % noiseCov is only based on the gyro bias and noise properties and
     %   thus does not change throughout the operation of the filter
-    QbarK = processNoise(gyroDt,sigma_v,sigma_u);
+    noiseCov = processNoise(gyroDt,sigma_noise,sigma_bias);
      
     % Declare arrays for gyroMeas and magMeas, to record the values for a
-    % simulation, so the simulation can be rerun.
-    v1 = attitudeQuat;
+    % simulation.
+    v1Quats = attitudeQuat;
     gyroVals = zeros(3,iterations);
     magVals = zeros(3,iterations);
     idealGyroVals = zeros(3,iterations);
-    v2errQs = zeros(4,iterations);
-    v1errQs = zeros(4,iterations);
-    
+    v2errQuats = zeros(4,iterations);
+    v1errQuats = zeros(4,iterations);
+   
     %% Filter Loop
     % The code above gets the initial attitudeQuat and covariance, but 
     %   after that the attitudeQuat and covariance for each loop would be 
@@ -116,28 +130,32 @@ function [v2errQs,v1errQs] = runFilter(attitudeQuat,covariance,gyrobias)
         
         %% Test Simulation
         
-        % Generate the actual angular velocity of the rocket. Currently,
-        %   always returns the same value, but you can make it dependent on
-        %   i, the iteration number and thus point in time.
-        [idealAngV,currentQuat] = idealPath(rotationTime,rotVec,gyroDt);
+        % Generate the actual ideal angular velocity of the rocket, and 
+        %   precise current orientation of the rocket.
+        [idealAngV,trueOrient] = idealPath(rotationTime,rotationVec,gyroDt);
         idealGyroVals(:,i) = idealAngV;
         
-        % TODO: Get gyroMeas
+        % Generate a simulated gyroscope measurement
         gyroMeas = readGyro(idealAngV);
         gyroVals(:,i) = gyroMeas;
-        % TODO: get WMM total intensity vector F
-        F = readWMM();
-        % TODO: Get magMeas, the measurement from the magnetometer
-        % TODO: consider normalizing F for all comparisons
-        magMeas = readMag(currentQuat,F);
+        
+        % Generate a simulated World Magnetic Model magnetic field vector.
+        %   If you have position data on the actual rocket or satellite,
+        %   make this dependent on position (read the WMM).
+        magField = readWMM();
+        
+        % Generate a simulated magnetometer measurement
+        % TODO: consider normalizing magField and magMeas
+        magMeas = readMag(trueOrient,magField);
         magVals(:,i) = magMeas;
         
-        % Get orientation tracking version 1 results
-        v1 = gyroIntegrate(v1,gyroMeas,gyroDt);
+        % Get orientation tracking version 1 (naive quaternion integration)
+        %   results to compare to USQUE
+        v1Quats = gyroIntegrate(v1Quats,gyroMeas,gyroDt);
         
         %% Propagation Step
         % Eq.s (5),(33),(32)
-        % Decompose the postupdate (most recent) covariance and QbarK (a
+        % Decompose the postupdate (most recent) covariance and noiseCov (a
         %   process noise related covariance), to get vectors that 
         %   represent the error distribution. Add the expected error 
         %   (updated mean state) to them and transform them into quaternion
@@ -147,8 +165,8 @@ function [v2errQs,v1errQs] = runFilter(attitudeQuat,covariance,gyrobias)
         %   the distribution of possible attitude quaternions. Also return 
         %   the bias components of the generated chi values, since these 
         %   components will not change between propagations.
-        [qK,chiBias] = sigmaQuats(lambda,covariance,QbarK,meanPlus,a,f,...
-        attitudeQuat,n);
+        [possQuats,possBias] = sigmaQuats(lambda,covariance,noiseCov,...
+            error,a,f,attitudeQuat,n);
         
     
         % In paper, readGyro() occurs here
@@ -157,7 +175,7 @@ function [v2errQs,v1errQs] = runFilter(attitudeQuat,covariance,gyrobias)
         % Eq. (35)
         % Create a distribution of possible angular velocities, 
         %   corresponding to different possible gyro bias values.
-        omegaK = sigmaOmegas(gyroMeas,meanPlus,chiBias,n);
+        possAngV = sigmaOmegas(gyroMeas,error,possBias,n);
         
         % TODO: Consider storing omegaK(0), since this is the best estimate
         %   of the rocket's angular velocity.
@@ -166,14 +184,14 @@ function [v2errQs,v1errQs] = runFilter(attitudeQuat,covariance,gyrobias)
         % Eq. (34)
         % Propogate the 13 qK sigma quaternions using the 13 angular 
         %   velocities to get 13 qK1 propagated sigma quaternions.
-        qK1 = quatPropagate(qK,omegaK,gyroDt);
+        possNewQuats = quatPropagate(possQuats,possAngV,gyroDt);
         
         
         % Eq.s (36), (37), and (38)
         % Find the propagated error quaternions. From them, find the 
         %   attitude error part of the propagated Chi values. Add chiBias 
         %   values to the bottom to get propagated Chi values.
-        ChiK1 = newChis(qK1,chiBias,n,f,a);
+        possNewError = newChis(possNewQuats,possBias,n,f,a);
         
         
         %% Prediction Step
@@ -181,7 +199,7 @@ function [v2errQs,v1errQs] = runFilter(attitudeQuat,covariance,gyrobias)
         % Now that we have our propagated Chi values  we can find our 
         %   predicted mean error (pre-update), and our predicted covariance
         %   (pre-update).
-        [meanMinus,PminusK1] = predictError(lambda,ChiK1,QbarK,n);
+        [predError,predCov] = predictError(lambda,possNewError,noiseCov,n);
         
         
         % Magentic Data
@@ -200,12 +218,12 @@ function [v2errQs,v1errQs] = runFilter(attitudeQuat,covariance,gyrobias)
         % For each sigma quaternion, generate an expected measurement
         % If you're adding a measurement, you can add it inside this
         %   function.
-        gammaK1 = sigmaMeas(qK1,F,n);
+        possExpMagMeas = sigmaMeas(possNewQuats,magField,n);
         
         
         % Eq. (9)
         % Find the mean expected observation vector
-        yK1 = predictMeas(lambda,gammaK1,n);
+        predMagMeas = predictMeas(lambda,possExpMagMeas,n);
         
         
         % Eq. (11), (12), and (23b)
@@ -213,12 +231,14 @@ function [v2errQs,v1errQs] = runFilter(attitudeQuat,covariance,gyrobias)
         %   covariance, using the expected measurements and magnetometer
         %   variance, respectively. Use these to find the innovation
         %   covariance.
-        PK1vv = innovationCov2(gammaK1,yK1,lambda,mag_sd,n);
+        newInnovationCov = innovationCov2(possExpMagMeas,predMagMeas,...
+            lambda,sigma_mag,n);
         
         
         % Eq. (13)
         % Find the cross-correlation matrix
-        PK1xy = crossCorr2(ChiK1,meanMinus,gammaK1,yK1,lambda,n);
+        newCrossCorrelation = crossCorr2(possNewError,predError,...
+            possExpMagMeas,predMagMeas,lambda,n);
         
         
         %% Update Step
@@ -231,8 +251,8 @@ function [v2errQs,v1errQs] = runFilter(attitudeQuat,covariance,gyrobias)
         %   propagated covariance
         % These are important results of each loop, and will be
         %   used in the next loop.
-        [meanPlus,covariance] = updateError(magMeas,yK1,PK1xy,PK1vv,...
-            meanMinus,PminusK1);
+        [error,covariance] = updateError(magMeas,predMagMeas,...
+            newCrossCorrelation,newInnovationCov,predError,predCov);
         
         %% Final Quaternion, Recording, and Resetting
         % Eq. (45a), (45b), and (44)
@@ -241,21 +261,22 @@ function [v2errQs,v1errQs] = runFilter(attitudeQuat,covariance,gyrobias)
         %   quaternion for this iteration.
         % This is one of the important results of each loop, and will be
         %   used in the next loop.
-        attitudeQuat = quatUpdate(meanPlus,f,a,qK1,n);
+        attitudeQuat = quatUpdate(error,f,a,possNewQuats,n);
         
         % Not technically part of the filter, used for testing purposes.
         % Find an error quaternion, which, if multiplied by attitudeQuat on
         %   the right, returns the actual ideal orientation quaternion of
         %   the rocket. Store this for each loop iteration.
-        v2errQs(:,i) = kalmanArrayMult(currentQuat,kalmanArrayInv(...
+        v2errQuats(:,i) = kalmanArrayMult(trueOrient,kalmanArrayInv(...
             attitudeQuat));
         % orientation version 1 errors
-        v1errQs(:,i) = kalmanArrayMult(currentQuat,kalmanArrayInv(v1));
+        v1errQuats(:,i) = kalmanArrayMult(trueOrient,kalmanArrayInv(...
+            v1Quats));
         
         % Instruction immediately after Eq. (45b)
         % Reset the first three components of meanPlus to zero 
         %   for the next propagation.
-        meanPlus = resetMean(meanPlus);
+        error = resetMean(error);
     end
     
     % Save vector and quaternion arrays to xls file

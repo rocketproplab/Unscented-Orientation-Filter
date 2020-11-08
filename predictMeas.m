@@ -1,6 +1,20 @@
-function yK1 = predictMeas(lambda,gammaK1,n)
+function predMagMeas = predictMeas(lambda,possExpMagMeas,n)
+    % 
+    % predictMeas(lambda,possExpMagMeas,n)
+    %
+    % predict the measurement the magnetometer will make based on the
+    %   possible magnetometer measurements
+    % 
+    % Parameters:
+    % possExpMagMeas are the possible magnetometer measurements that you 
+    %   expect
+    % lambda and n are fine tuning and a constant
+    %
+    % Results:
+    % predMagMeas is the predicted magnetometer measurement
+    
     % Eq. (9)
 	% Find the mean expected observation vector
-	yK1 = (lambda*gammaK1(:,2*n+1)+0.5*sum(gammaK1(:,1:(2*n)),2))/...
-        (n+lambda);
+	predMagMeas = (lambda*possExpMagMeas(:,2*n+1)+0.5*sum(...
+        possExpMagMeas(:,1:(2*n)),2))/(n+lambda);
 end
