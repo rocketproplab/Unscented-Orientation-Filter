@@ -34,7 +34,7 @@ function [v2errQuats,v1errQuats] = runFilter(attitudeQuat,covariance,gyrobias)
     %   unscented quaternion estimator (USQUE). They tested it using 10 
     %   second measurement periods over the course of hours; we plan on 
     %   using it with ~100Hz measurements over a few minutes.
-    % See description.txt for more information.
+    % See README for more information.
     
    
     % Remember to check units, in particular time units, for all constants 
