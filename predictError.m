@@ -1,9 +1,7 @@
-function [predError,predCov] = predictError(lambda,possNewError,...
-    noiseCov,n)
+function [predError, predCov] = predictError(lambda, possNewError, noiseCov, n)
     %
     % predictError(lambda,possNewError,noiseCov,n)
-    % predict the gyromeasurement error and the new covariance for this
-    %   step
+    % predict the gyromeasurement error and the new covariance for this step.
     %
     % Parameters:
     % possNewError are the possible new attitude error vectors

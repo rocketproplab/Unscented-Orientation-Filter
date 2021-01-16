@@ -8,7 +8,7 @@ A MATLAB implementation of Crassidis and Markley's Unscented Quaternion Estimato
 Download this code and open testFilter.m and runFilter.m in the MATLAB IDE. Try running testFilter.m
 
 
-### Simulating USQUE performane for different flights
+### Simulating USQUE performance for different flights
 To configure the simulation you would like to run, open `testFilter.m`, `runFilter.m`, `idealPath.m`, `readGyro.m`, and `readMag.m`. In `testFilter.m`, set the Kalman filter's knowledge of the initial orientation quaternion, initial covariance, and initial bias. Set the true initial orientation quaternion in `idealPath.m`, and the true initial bias in `readGyro.m` (make these different from the values in `testFilter.m` to see how USQUE corrects errors). In `runFilter.m`, Under "Simulation Parameters", set the time it takes for the spacecraft to complete a rotation, the vector the spacecraft turns around, the runtime of the simulation, the sensor sampling interval, and the filter's knowledge of gyroscope bias standard deviation, gyroscope noise standard deviation, and magnetometer noise standard deviation. Set the true gyroscope noise and bias standard deviations in `readGyro.m`, and set the true magnetometer noise standard deviation in `readMag.m`.
     
 ### Fine tuning USQUE
