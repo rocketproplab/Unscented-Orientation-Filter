@@ -1,11 +1,10 @@
 function quat = rotQuat(theta, v)
     % quat(theta, v)
-    % 
+    
+	% Finds a rotation quaternion from a total rotation angle and a 
+	%	rotation vector
     % This function is adapted to the Crassadis Markley quaternion
-    %   convention, with the fourth term being the scalar term
-    % Finds a rotation quaternion
-    %   from a total rotation angle
-    %   and a rotation vector
+    %   convention, with the fourth term being the scalar cosine term
     % theta is an angle in RADIANS
     % v is a vector with 3 entries
     

@@ -25,7 +25,7 @@ function [gyroMeas] = readGyro(idealAngV)
     %   white-noise added, with standard deviation equal to sigma_noise
     
     
-    % DO STUFF IN RADIANS AND SECONDS
+    % USE RADIANS AND SECONDS
     
     persistent bias
     if isempty(bias)

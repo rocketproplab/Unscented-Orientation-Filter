@@ -5,10 +5,9 @@ function possNewQuats = quatPropagate(possQuats,possAngV,gyroDt)
     %   rotations of the spacecraft
     %
     % Parameters:
-    % possQuats is the array of pre-propogation sigma
-    %   quaternions
-    % possAngV is the array of estimated sigma angular
-    %   velocities (measured minus Chi bias sigma vectors)
+    % possQuats is the array of pre-propogation sigma quaternions
+    % possAngV is the array of estimated sigma angular velocities (measured
+	%	minus Chi bias sigma vectors)
     % gyroDt is the sampling interval in the gyro
     %
     % Results:

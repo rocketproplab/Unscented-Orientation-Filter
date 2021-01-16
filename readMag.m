@@ -7,7 +7,7 @@ function magMeas = readMag(trueOrient,magField)
     % magMeas, a simulated magnetometer measurement
     
     
-    % DO ALL MAG STUFF IN Tesla
+    % USE Tesla
     
     % Figure out how to find mag_sd
     % mag_sd is the magnetometer standard deviation. The paper says "Note 

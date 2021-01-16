@@ -35,7 +35,6 @@ function [v2errQuats,v1errQuats] = runFilter(attitudeQuat,covariance,gyrobias)
 	%   second measurement periods over the course of hours; we plan on
 	%   using it with ~100Hz measurements over a few minutes.
 	% See README for more information.
-	initialGyroBias = gyrobias;
 	
 	
 	% Remember to check units, in particular time units, for all constants
@@ -151,7 +150,7 @@ function [v2errQuats,v1errQuats] = runFilter(attitudeQuat,covariance,gyrobias)
 		
 		% Get orientation tracking version 1 (naive quaternion integration)
 		%   results to compare to USQUE
-		v1Quats = gyroIntegrate(v1Quats,gyroMeas-initialGyroBias,gyroDt);
+		v1Quats = gyroIntegrate(v1Quats,gyroMeas,gyroDt);
 		
 		%% Propagation Step
 		% Eq.s (5),(33),(32)

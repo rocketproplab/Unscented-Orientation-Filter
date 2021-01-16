@@ -1,12 +1,9 @@
-function newQuat = conjQuat(quat1)
+function newQuat = conjQuat(quat)
     % conjQuat(quat1)
     %
     % Finds the conjugate of a quaternion
-    % quat1 is a vector with 4 entries
-    % quat1 is the quaternion whose conjugate should be found
-    % cosine term 4th
+    % quat is the quaternion whose conjugate should be found
+    % This uses the quaternion convention with the scalar cosine term 4th
     
-    newQuat(1) = -quat1(1);
-    newQuat(2) = -quat1(2);
-    newQuat(3) = -quat1(3);
-    newQuat(4) = quat1(4);
+    newQuat = [-quat(1:3);quat(4)];
+end

@@ -6,8 +6,8 @@ function [idealAngV,currentQuat] = idealPath(rotationTime,rotVec,gyroDt)
     %   velocity and ideal orientation
     %
     % parameters:
-    % rotationTime is the time it takes the spacecraft to complete a
-    %   full rotation in seconds
+    % rotationTime is the time it takes the spacecraft to complete a full
+	%	rotation in seconds
     % rotVec is the vector the spacecraft is rotating around
     % gyroDt is the gyroscope measuring interval
     %

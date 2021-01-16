@@ -18,8 +18,8 @@ function possNewError = newChis(possNewQuats,possBias,n,f,a)
     %   out as an identity quaternion
     dqK1 = zeros(4,2*n+1);
     for i=1:(2*n+1)
-        dqK1(:,i) = kalmanArrayMult(possNewQuats(:,i), ...
-            kalmanArrayInv(possNewQuats(:,2*n+1)));
+        dqK1(:,i) = kalmanArrayMult(possNewQuats(:,i), kalmanArrayInv(...
+			possNewQuats(:,2*n+1)));
     end
     
     % Eq. (37)
