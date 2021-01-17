@@ -14,6 +14,7 @@ function testFilter()
 	%	flight sensor simulations, you should edit readMag.m, readGyro.m,
 	%	and idealPath.m.
 	
+	clear all;
 	clc; % Clear command window.
 	% Let's time this function to see how long it takes to run.
 	startTime = tic;
@@ -30,7 +31,7 @@ function testFilter()
 		bias_err]);
 	
 	% Define gyro bias estimate.
-	gyrobias = [0;0;0]; %(pi/6.48)*(1e-5)*[1;1;1];
+	gyrobias = (pi/6.48)*(1e-5)*[1;1;1];
 	
 	%----------------------------------------------------------------------
 	% HERE IS THE MAIN PART OF THE FUNCTION!

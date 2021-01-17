@@ -17,6 +17,7 @@ function attitudeQuat = quatUpdate(error,f,a,possNewQuats,n)
     % 
     % Eq. (45a)
 	% Find the scalar component of the quaternion update
+	dqplusK1 = [0;0;0;0];
 	dqplusK1(4,1) = (-a*(norm(error(1:3,1)))^2 + f*sqrt(f^2+(1-a^2)...
         *(norm(error(1:3,1)))^2))/(f^2+(norm(error(1:3,1)))^2);
         
