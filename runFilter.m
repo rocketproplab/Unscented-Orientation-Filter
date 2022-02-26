@@ -125,7 +125,7 @@ function [v2errQuats,v1errQuats] = runFilter(attitudeQuat,covariance,gyrobias)
 		
 		%% Test Simulation
 		if rem(k, 500) == 0
-			fprintf('On iteration #%d...\n', k);
+			fprintf('On iteration #%d...\n', int8(k));
 		end
 		
 		% Generate the actual ideal angular velocity of the rocket, and
