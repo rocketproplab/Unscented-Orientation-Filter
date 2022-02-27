@@ -1,0 +1,17 @@
+build/
+old/
+test/
+CMake-stuff/
+00MEMO
+TODO
+Makefile.bak
+
+test.cpp
+test.exe
+USQUE.h 
+libUSQUE.dylib 
+Main.class 
+USQUE.class 
+native_filter.o 
+write_params
+

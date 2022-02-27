@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CMakeRunConfigurationManager" shouldGenerate="true" shouldDeleteObsolete="true">
+    <generated>
+      <config projectName="USQUE" targetName="SET_PARAM" />
+      <config projectName="USQUE" targetName="USQUE_EXE" />
+      <config projectName="USQUE" targetName="USQUE" />
+      <config projectName="USQUE" targetName="USQUE_tests" />
+    </generated>
+  </component>
+  <component name="CMakeSettings">
+    <configurations>
+      <configuration PROFILE_NAME="Debug" CONFIG_NAME="Debug" />
+    </configurations>
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="1ccd7722-ae2f-4d24-988e-4e937b7239ed" name="Default Changelist" comment="" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ClangdSettings">
+    <option name="formatViaClangd" value="false" />
+  </component>
+  <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:Debug" />
+  <component name="ProjectId" id="1kcGyqKGV2AEfUIMr5EjMgg6MDX" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showExcludedFiles" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="settings.editor.selected.configurable" value="reference.settingsdialog.IDE.editor.colors.Language Defaults" />
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/includes" />
+    </key>
+  </component>
+  <component name="RunManager" selected="CMake Application.USQUE_EXE">
+    <configuration name="SET_PARAM" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" PROJECT_NAME="USQUE" TARGET_NAME="SET_PARAM" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="USQUE" RUN_TARGET_NAME="SET_PARAM">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="USQUE" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" PROJECT_NAME="USQUE" TARGET_NAME="USQUE" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="USQUE_EXE" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" PROJECT_NAME="USQUE" TARGET_NAME="USQUE_EXE" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="USQUE" RUN_TARGET_NAME="USQUE_EXE">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="USQUE_tests" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" PROJECT_NAME="USQUE" TARGET_NAME="USQUE_tests" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="USQUE" RUN_TARGET_NAME="USQUE_tests">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <list>
+      <item itemvalue="CMake Application.SET_PARAM" />
+      <item itemvalue="CMake Application.USQUE" />
+      <item itemvalue="CMake Application.USQUE_EXE" />
+      <item itemvalue="CMake Application.USQUE_tests" />
+    </list>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="1ccd7722-ae2f-4d24-988e-4e937b7239ed" name="Default Changelist" comment="" />
+      <created>1605992724318</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1605992724318</updated>
+      <workItem from="1605992729798" duration="634000" />
+      <workItem from="1605995389194" duration="4076000" />
+      <workItem from="1606000407176" duration="2795000" />
+      <workItem from="1606587719506" duration="9477000" />
+      <workItem from="1606605908010" duration="2444000" />
+      <workItem from="1606610118930" duration="734000" />
+      <workItem from="1607194233094" duration="2083000" />
+      <workItem from="1607199799260" duration="5714000" />
+      <workItem from="1609616223383" duration="6159000" />
+      <workItem from="1610212515097" duration="2951000" />
+      <workItem from="1610218970233" duration="5795000" />
+      <workItem from="1610821599007" duration="953000" />
+      <workItem from="1611425859449" duration="210000" />
+      <workItem from="1611426294460" duration="4155000" />
+      <workItem from="1613243739000" duration="2101000" />
+      <workItem from="1613249065167" duration="2629000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="1" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="69" y="198" width="899" height="676" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1606610132864">
+      <screen x="0" y="23" width="1920" height="1002" />
+    </state>
+    <state x="69" y="198" width="899" height="676" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.23.1920.1002@0.23.1920.1002" timestamp="1606610132864" />
+    <state x="1157" y="412" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog" timestamp="1606605806326">
+      <screen x="0" y="23" width="1920" height="1002" />
+    </state>
+    <state x="1157" y="412" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog/0.23.1920.1002@0.23.1920.1002" timestamp="1606605806326" />
+    <state x="258" y="277" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1607195655231">
+      <screen x="0" y="23" width="1920" height="1002" />
+    </state>
+    <state x="258" y="277" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.23.1920.1002@0.23.1920.1002" timestamp="1607195655231" />
+    <state x="210" y="142" key="SettingsEditor" timestamp="1607211201452">
+      <screen x="0" y="23" width="1920" height="1002" />
+    </state>
+    <state x="210" y="142" key="SettingsEditor/0.23.1920.1002@0.23.1920.1002" timestamp="1607211201451" />
+    <state x="535" y="339" key="com.intellij.ide.util.TipDialog" timestamp="1613249068308">
+      <screen x="0" y="23" width="1920" height="1001" />
+    </state>
+    <state x="535" y="339" key="com.intellij.ide.util.TipDialog/0.0.1920.1080@0.0.1920.1080" timestamp="1613243749776" />
+    <state x="535" y="339" key="com.intellij.ide.util.TipDialog/0.23.1920.1001@0.23.1920.1001" timestamp="1613249068308" />
+    <state x="535" y="339" key="com.intellij.ide.util.TipDialog/0.23.1920.1002@0.23.1920.1002" timestamp="1610218973261" />
+    <state x="601" y="157" width="837" height="729" key="find.popup" timestamp="1605993163600">
+      <screen x="0" y="23" width="1920" height="1002" />
+    </state>
+    <state x="601" y="157" width="837" height="729" key="find.popup/0.23.1920.1002@0.23.1920.1002" timestamp="1605993163600" />
+  </component>
+</project>

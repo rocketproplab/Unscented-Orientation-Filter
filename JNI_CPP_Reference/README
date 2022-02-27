@@ -1,0 +1,17 @@
+This unfinished c++ code used Java Native Interface (JNI) to interface 
+	with the rest of the rocket code, which was written in Java. Parameters are
+	passed using JSON in a string passed through JNI to the c++ code and back 
+	to Java.
+I was in the process of modifying this code to pass a JNI string back to the 
+	Java as a return value, when I heard the news that we were replacing the 
+	Java on the rocket with c++. Hurray! I have always been an advocate of not 
+	running Java on a rocket, since an executing java program can just pause to
+	do garbage collection instead of running your code, and you don't want your
+	code to just pause execution for half a second on a rocket.
+Now we can get rid of the JNI stuff, and most of the JSON stuff as well. We will
+	still need to use some of the JSON stuff to read parameters for the filter 
+	algorithm and the inertial measurement unit (IMU) when the rocket starts up.
+You can use the code in this folder as a reference for development of the c++
+	only code.
+
+
