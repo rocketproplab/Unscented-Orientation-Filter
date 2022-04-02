@@ -8,34 +8,93 @@
 
 using namespace std;
 
-// JNIEXPORT void JNICALL
-// Java_USQUE_filterStep(JNIEnv *env, jclass obj, jstring json_params) {
-filterStep(const double gyroDt, const double sigma_bias, const double 
-	sigma_noise, const double sigma_mag, Eigen::MatrixXd noiseCov, 
-	Eigen::Vector4d attitudeQuat, Eigen::MatrixXd covariance, Eigen::Vector3d 
-	gyroBias, Eigen::Vector3d magMeas, Eigen::Vector3d magField, Eigen::VectorXd 
-	error) {
-/*	Input descriptions: gyroDt is the gyro sampling interval, sigma_bias is the
-	gyro bias standard deviation, sigma_noise is the gyro noise standard 
-	deviation sigma_mag is the magnetometer noise standard deviation, noiseCov
-	is the noise covariance, attitudeQuat is the initial orientation quaternion,
-	covariance is the estimated initial covariance, gyroBias is the estimated
-	initial gyro bias, gyroMeas and magMeas are gyroscope and magnetometer 
-	measurements, magField is the government provided expected magnetic field 
-	vector at our location (we can calculate this on the fly or pre-load onto 
-	the rocket). error is the estimated error vector.*/
-// TODO: what exactly is error
+JNIEXPORT void JNICALL
+Java_USQUE_filterStep(JNIEnv *env, jclass obj, jstring json_params) {
 
-/*	Fine tuning parameters described in the research paper. Recommmended values
-	are a=1, lambda=1, and f=4 */ 
     const int a = 1;
     const int lambda = 1;
     const int f = 4;
-	
-/*	Half the number of sampling points for the extended Kalman filter. Should be
-	n=6 unless you are modifying the algorithm */
     const int n = 6;
 
+	// receive the string from jni and convert to json object
+	const char *param_string = env->GetStringUTFChars(json_params,0); 
+	auto Params = nlohmann::json::parse(param_string);
+	env->ReleaseStringUTFChars(json_params,param_string);
+
+	// --------------------------------------------------------------
+	// Read in constants
+	// --------------------------------------------------------------
+
+	// read in the gyro sampling interval
+    auto gyroDt = Params["gyroDt"].get<double>();
+    // read in the gyro bias standard deviation
+    auto sigma_bias = Params["sigma_bias"].get<double>();
+    // read in the gyro noise standard deviation
+    auto sigma_noise = Params["sigma_noise"].get<double>();
+
+    // read in the magnetometer noise standard deviation
+    auto sigma_mag = Params["sigma_mag"].get<double>();
+
+	// read in the noise covariance
+	// TODO: Can I improve this conversion?
+	auto vecNoiseCov = Params["noiseCov"].get<std::vector<std::vector
+		<double>>>();
+	Eigen::MatrixXd noiseCov(6,6);
+	for(int i = 0; i < 6; i++) {
+		for(int j = 0; j < 6; j++) {
+			noiseCov(i,j) = vecNoiseCov[i][j];
+		}
+	}
+
+
+	// --------------------------------------------------------------
+	// Read in iteration variables
+	// --------------------------------------------------------------
+
+	// read in the estimated initial rocket orientation quaternion
+    auto vecAttitudeQuat = Params["attitudeQuat"].get<std::vector<double>>();
+	Eigen::Map<Eigen::Vector4d> attitudeQuat(&vecAttitudeQuat[0],4);
+	cerr << "attitudeQuat is: " << endl;
+	for(int i = 0; i < 4; i++) {
+		cerr << attitudeQuat[i] << endl;
+	}
+	cerr << "with parentheses: "<< endl;
+	for(int i = 0; i < 4; i++) {
+		cerr << attitudeQuat(i) << endl;
+	}
+
+    // read in the estimated initial covariance
+    auto vecCovariance = Params["covariance"].get
+            <std::vector<std::vector<double>>>();
+	Eigen::MatrixXd covariance(6,6);
+	for(int i = 0; i < 6; i++) {
+		for(int j = 0; j < 6; j++) {
+			covariance(i,j) = vecCovariance[i][j];
+		}
+	}
+	cerr << "covariance is: \n" << covariance << endl;
+
+    // read in the estimated initial gyro bias
+    auto vecGyroBias = Params["gyroBias"].get<std::vector<double>>();
+	Eigen::Map<Eigen::Vector3d> gyroBias(&vecGyroBias[0],3);
+	cerr << "gyroBias is: \n" << gyroBias << endl;
+
+	// read in measurements
+	auto vecGyroMeas = Params["gyroMeas"].get<std::vector<double>>();
+	Eigen::Map<Eigen::Vector3d> gyroMeas(&vecGyroMeas[0],3);
+	cerr << "gyroMeas is: \n" << gyroMeas << endl;
+	auto vecMagMeas = Params["magMeas"].get<std::vector<double>>();
+	Eigen::Map<Eigen::Vector3d> magMeas(&vecMagMeas[0],3);
+	cerr << "magMeas is: \n" << magMeas << endl;
+	auto vecMagField = Params["magField"].get<std::vector<double>>();
+	Eigen::Map<Eigen::Vector3d> magField(&vecMagField[0],3);
+	cerr << "magField is: \n" << magField << endl;
+
+
+	// read in error
+	auto vecError = Params["error"].get<std::vector<double>>();
+	Eigen::Map<Eigen::VectorXd> error(&vecError[0],6);
+	cerr << "error is: \n" << error << endl;
 
 	Eigen::MatrixXd chi = chiValues(lambda,covariance,noiseCov,error);
 
@@ -77,6 +136,8 @@ filterStep(const double gyroDt, const double sigma_bias, const double
 	attitudeQuat = quatUpdate(error, f, a, possNewQuats); // new attitudeQuat
 
 	error.head(3) << 0,0,0;
+	
+	
 	
 
 	return;
