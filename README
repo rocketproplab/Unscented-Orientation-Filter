@@ -1,3 +1,0 @@
-See Matlab reference code in matlab folder
-I started translating to c++ in the filter_step.cpp file
-We should get rid of the JNI interface and pass by reference or by value instead
