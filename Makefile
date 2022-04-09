@@ -1,4 +1,4 @@
-CC = gcc
+CC = g++
 override CFLAGS += -Og -g -Wall
 
 TARGETS = runFilter.o testbench-sim.o filter_step.o

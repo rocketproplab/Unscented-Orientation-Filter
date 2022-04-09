@@ -1,6 +1,6 @@
 #include "runFilter.h"
-#include "lib/Eigen/Cholesky"
-#include "lib/Eigen/LU"
+#include "Eigen/Cholesky"
+#include "Eigen/LU"
 
 void runFilter(
 	Eigen::Vector4d& attitudeQuat, 
