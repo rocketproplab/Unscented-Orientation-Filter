@@ -1,14 +1,13 @@
 CC = g++
 override CFLAGS += -Og -g -Wall
 
-TARGETS = runFilter.o testbench-sim.o filter_step.o
-
 .PHONY: clean
 
-all: $(TARGETS)
+usque.o: src/usque/usque.cpp
+	$(CC) $(CFLAGS) -c -Ilib/ $^ -o out/usque.o
 
 %.o: %.cpp
 	$(CC) $(CFLAGS) -c -Ilib/ $^ -o $@
 
 clean:
-	rm -f **.o  
+	rm -rf **.o out/** 

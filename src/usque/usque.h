@@ -1,15 +1,19 @@
-#ifndef FILTER_STEP_H
+#ifndef USQUE_H
+#define USQUE_H
 #include <vector>
 #include "Eigen/Cholesky"
 
-Eigen::MatrixXd attitudeMatrix(Eigen::Vector4d quat);
+
+#define N 6
+
+void attitudeMatrix(Eigen::Vector4d& quat, Eigen::Matrix3d& result);
 
 Eigen::MatrixXd chiValues(
 	int lambda, 
-	Eigen::MatrixXd covariance, 
-	Eigen::MatrixXd noiseCov, 
-	Eigen::VectorXd error
-);
+	Eigen::MatrixXd& covariance, 
+	Eigen::MatrixXd& noiseCov, 
+	Eigen::VectorXd& error
+	);
 
 Eigen::MatrixXd crossCorr(
 	Eigen::MatrixXd possNewError,
@@ -79,8 +83,8 @@ Eigen::Vector4d quatUpdate(
 );
 
 Eigen::MatrixXd sigmaMeas(
-	Eigen::MatrixXd possNewQuats, 
-	Eigen::Vector3d magField
+	Eigen::MatrixXd& possNewQuats, 
+	Eigen::Vector3d& magField
 );
 
 Eigen::MatrixXd sigmaOmegas(
