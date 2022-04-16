@@ -6,7 +6,7 @@
 
 #define N 6
 
-void attitudeMatrix(Eigen::Vector4d& quat, Eigen::Matrix3d& result);
+Eigen::Matrix3d attitudeMatrix(Eigen::Vector4d& quat);
 
 Eigen::MatrixXd chiValues(
 	int lambda, 

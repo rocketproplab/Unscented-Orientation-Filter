@@ -6,8 +6,8 @@ override CFLAGS += -Og -g -Wall
 usque.o: src/usque/usque.cpp
 	$(CC) $(CFLAGS) -c -Ilib/ $^ -o out/usque.o
 
-%.o: %.cpp
-	$(CC) $(CFLAGS) -c -Ilib/ $^ -o $@
+%.o: src/usque/%.cpp
+	$(CC) $(CFLAGS) -c -Ilib/ $^ -o out/$@
 
 clean:
 	rm -rf **.o out/** 

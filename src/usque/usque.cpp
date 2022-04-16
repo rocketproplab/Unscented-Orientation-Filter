@@ -3,7 +3,7 @@
 #include <iostream>
 
 
-void attitudeMatrix(Eigen::Vector4d& quat, Eigen::Matrix3d& result) {
+Eigen::Matrix3d attitudeMatrix(Eigen::Vector4d& quat) {
 	Eigen::Matrix<double, 3, 4>& eps;
 	Eigen::Matrix<double, 4, 3>& psi;
 	/*
@@ -59,45 +59,51 @@ void filterStep(
 	
 /*	Half the number of sampling points for the extended Kalman filter. Should be
 	n=6 unless you are modifying the algorithm */
+
+	/* runFilter.m: 167 */
+	//sigmaQuats.m: 1-33
 	Eigen::MatrixXd chi = chiValues(lambda,covariance,noiseCov,error);
-
-	// cerr << "chi: " << endl;
-	// cerr << chi << endl;
-
+	//sigmaQuats.m: 34-70
 	Eigen::MatrixXd possQuats = quatDistribution(a,f,chi,attitudeQuat);
 
+	//runFilter.m: 175 (Eq. 35)
 	Eigen::MatrixXd possAngV = sigmaOmegas(gyroMeas, error, chi);
-
+	//runFilter.m: 183 (Eq. 34)
 	Eigen::MatrixXd possNewQuats = quatPropagate(possQuats,possAngV,gyroDt);
-
+	//runFilter.m: 189
 	Eigen::MatrixXd possNewError = newChis(possNewQuats, chi, f, a);
-
+	//predictError.m: 18
 	Eigen::VectorXd predError = predictError(lambda, possNewError, noiseCov);
-
+	//predictError.m: 19-27
 	Eigen::MatrixXd predCov = predictCov(lambda, possNewError, noiseCov, 
 		predError);
-
+	//runFilter.m: 213
 	Eigen::MatrixXd possExpMagMeas = sigmaMeas(possNewQuats, magField);
-
+	
+	//runFilter.m: 217
 	Eigen::Vector3d predMagMeas = predictMeas(lambda, possExpMagMeas);
 
+	//runFilter.m: 224
 	Eigen::MatrixXd newInnovationCov = innovationCov(possExpMagMeas, 
 		predMagMeas, lambda, sigma_mag);
 	
+	//runFilter.m: 229
 	Eigen::MatrixXd newCrossCorrelation = crossCorr(possNewError, predError,
 		possExpMagMeas, predMagMeas, lambda);
 
+	//updateError.m: 27
 	Eigen::Vector3d innovation = magMeas - predMagMeas;
-
+	//updateError.m: 31
 	Eigen::MatrixXd gain = newCrossCorrelation * 
 		newInnovationCov.inverse();
-	
+	//runFilter.m: 257-258
 	error = predError + gain*innovation; // Generate new error
 
+	//updateError.m: 41
 	covariance = predCov - gain*newInnovationCov * gain.transpose(); // New cov
-	
+	//runFilter.m: 251
 	attitudeQuat = quatUpdate(error, f, a, possNewQuats); // new attitudeQuat
-
+	//runFilter.m: 266
 	error.head(3) << 0,0,0;
 	
 
@@ -105,6 +111,11 @@ void filterStep(
 }
 
 
+
+
+/*
+	Corresponds to sigmaQuats:1-33
+ */
 Eigen::MatrixXd chiValues(int lambda, Eigen::MatrixXd covariance, 
 	Eigen::MatrixXd noiseCov, Eigen::VectorXd error) {
 	using namespace Eigen;
