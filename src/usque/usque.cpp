@@ -31,7 +31,7 @@ void filterStep(
 	const double sigma_bias, 
 	const double sigma_noise, 
 	const double sigma_mag, 
-	Eigen::MatrixXd& noiseCov, 
+	Eigen::MatrixXd& noiseCov, //6x6 
 	Eigen::Vector4d& attitudeQuat, 
 	Eigen::MatrixXd& covariance, 
 	Eigen::Vector3d& gyroBias,
@@ -71,7 +71,7 @@ void filterStep(
 	//runFilter.m: 183 (Eq. 34)
 	Eigen::MatrixXd possNewQuats = quatPropagate(possQuats,possAngV,gyroDt);
 	//runFilter.m: 189
-	Eigen::MatrixXd possNewError = newChis(possNewQuats, chi, f, a);
+	Eigen::Matrix<double, __N__, 2 * __N__ + 1> possNewError = newChis(possNewQuats, chi, f, a);
 	//predictError.m: 18
 	Eigen::VectorXd predError = predictError(lambda, possNewError, noiseCov);
 	//predictError.m: 19-27
