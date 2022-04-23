@@ -1,13 +1,10 @@
-#include "Eigen/Cholesky"
-
-
-
+#include "usque.hpp"
 
 Eigen::Vector4d quatUpdate(
-	Eigen::VectorNd& error, 
+	VectorNd& error, 
 	const int f, 
 	const int a, 
-	Eigen::MatrixNd& possNewQuats
+	Eigen::Matrix<double, 4, 2 * __N__ + 1>& possNewQuats
 ) {
 	Eigen::Vector4d update;
 	double fourVal = (-a * error.head(3).squaredNorm() + f * sqrt(f*f + 

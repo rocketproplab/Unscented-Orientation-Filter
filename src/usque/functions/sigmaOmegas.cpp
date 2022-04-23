@@ -2,7 +2,6 @@
 
 Eigen::Matrix<double, 3, 2 * __N__ + 1> sigmaOmegas(
 	Eigen::Vector3d& gyroMeas, 
-	//Eigen::VectorXd& error, 
 	Eigen::Matrix<double, __N__, 2 * __N__ + 1>& chi
 ) {
 	// cerr << "entered sigmaOmegas" << endl;

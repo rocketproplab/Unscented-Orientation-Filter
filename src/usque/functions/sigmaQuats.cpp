@@ -29,7 +29,8 @@ Eigen::Matrix<double, 4, 2 * __N__ + 1> quatDistribution(
 	int a, 
 	int f, 
 	MatrixNd& chi, 
-	Eigen::Vector4d& attitudeQuat) {
+	Eigen::Vector4d& attitudeQuat
+) {
 	Eigen::Matrix<double, 4, 2 * __N__> dqK;
 	for(int i = 0; i < 2 * __N__; i++) {
 		dqK(3,i) = (-a * chi.block(0,i,3,1).squaredNorm() + f * sqrt(f*f + 

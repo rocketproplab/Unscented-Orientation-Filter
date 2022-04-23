@@ -39,15 +39,17 @@ MatrixErr6 chiValues(
 /*
 	
  */
-Eigen::MatrixXd crossCorr(
-	Eigen::MatrixXd possNewError,
-	Eigen::VectorXd predError, 
-	Eigen::MatrixXd possExpMagMeas,
-	Eigen::Vector3d predMagMeas, 
-	int lambda
+Eigen::Matrix<double, 6, 3> crossCorr(
+	MatrixErr6& possNewError, //6x13
+	VectorNd& predError, //6
+	Eigen::Matrix<double, 3, 2 * __N__ + 1>& possExpMagMeas, //3x13
+	Eigen::Vector3d& predMagMeas, //3
+	const int lambda
 );
 
-Eigen::MatrixXd crossMatrix(Eigen::Vector3d vec);
+Eigen::Matrix3d crossMatrix(Eigen::Vector3d& vec);
+
+Eigen::Matrix3d crossMatrix(Eigen::Vector3d&& vec);
 
 Eigen::MatrixXd innovationCov(
 	Eigen::MatrixXd possExpMagMeas, 
@@ -60,23 +62,43 @@ Eigen::Vector4d kalmanArrayInv(
 	Eigen::Vector4d&& quat
 );
 
+Eigen::Vector4d kalmanArrayInv(
+	Eigen::Vector4d& quat
+);
+
+Eigen::Vector4d kalmanArrayMult(
+	Eigen::Vector4d& vecLeft, 
+	Eigen::Vector4d& vecRight
+);
+
 Eigen::Vector4d kalmanArrayMult(
 	Eigen::Vector4d&& vecLeft, 
 	Eigen::Vector4d& vecRight
 );
 
-Eigen::MatrixXd newChis(
-	Eigen::MatrixXd possNewQuats, 
-	Eigen::MatrixXd chi, 
-	int f, 
-	int a
+Eigen::Vector4d kalmanArrayMult(
+	Eigen::Vector4d& vecLeft, 
+	Eigen::Vector4d&& vecRight
 );
+
+Eigen::Vector4d kalmanArrayMult(
+	Eigen::Vector4d&& vecLeft, 
+	Eigen::Vector4d&& vecRight
+);
+
+Eigen::Matrix<double, __N__, 2 * __N__ + 1> newChis(
+	Eigen::Matrix<double, 4, 2 * __N__ + 1>& possNewQuats, 
+	Eigen::Matrix<double, __N__, 2 * __N__ + 1>& chi,
+	const int f, 
+	const int a
+); 
 
 Eigen::VectorXd predictError(
 	int lambda, 
 	Eigen::MatrixXd possNewError, 
 	Eigen::MatrixXd noiseCov
 );
+
 Eigen::MatrixXd predictCov(
 	int lambda, 
 	Eigen::MatrixXd possNewError, 
@@ -89,23 +111,24 @@ Eigen::Vector3d predictMeas(
 	Eigen::MatrixXd possExpMagMeas
 );
 
-Eigen::MatrixXd quatDistribution(
+Eigen::Matrix<double, 4, 2 * __N__ + 1> quatDistribution(
 	int a, 
 	int f, 
-	Eigen::MatrixXd chi, 
-	Eigen::Vector4d attitudeQuat
+	MatrixNd& chi, 
+	Eigen::Vector4d& attitudeQuat
 );
-Eigen::MatrixXd quatPropagate(
-	Eigen::MatrixXd possQuats, 
-	Eigen::MatrixXd possAngV, 
+
+Eigen::Matrix<double, 4, 2 * __N__ + 1> quatPropagate(
+	Eigen::Matrix<double, 4, 2 * __N__ + 1>& possQuats, 
+	Eigen::Matrix<double, 3, 2 * __N__ + 1>& possAngV, 
 	double gyroDt
 );
 
 Eigen::Vector4d quatUpdate(
-	Eigen::VectorXd error, 
-	int f, 
-	int a, 
-	Eigen::MatrixXd possNewQuats
+	VectorNd& error, 
+	const int f, 
+	const int a, 
+	Eigen::Matrix<double, 4, 2 * __N__ + 1>& possNewQuats
 );
 
 Eigen::Matrix<double, 3, 2 * __N__ + 1> sigmaMeas(
@@ -113,10 +136,9 @@ Eigen::Matrix<double, 3, 2 * __N__ + 1> sigmaMeas(
 	Eigen::Vector3d& magField 
 );
 
-Eigen::MatrixXd sigmaOmegas(
-	Eigen::Vector3d gyroMeas, 
-	Eigen::VectorXd error, 
-	Eigen::MatrixXd chi
+Eigen::Matrix<double, 3, 2 * __N__ + 1> sigmaOmegas(
+	Eigen::Vector3d& gyroMeas, 
+	MatrixErr6& chi
 );
 
 #endif

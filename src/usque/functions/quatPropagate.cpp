@@ -1,11 +1,4 @@
-#include "Eigen/Cholesky"
-
-#define __N__ 6
-
-
-Eigen::Matrix3d crossMatrix(Eigen::Vector3d& vec);
-
-Eigen::Matrix3d crossMatrix(Eigen::Vector3d&& vec);
+#include "usque.hpp"
 
 Eigen::Matrix<double, 4, 2 * __N__ + 1> quatPropagate(
 	Eigen::Matrix<double, 4, 2 * __N__ + 1>& possQuats, 
