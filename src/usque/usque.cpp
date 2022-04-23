@@ -62,20 +62,20 @@ void filterStep(
 
 	/* runFilter.m: 167 */
 	//sigmaQuats.m: 1-33
-	Eigen::MatrixXd chi = chiValues(lambda,covariance,noiseCov,error);
+	Eigen::Matrix<double, __N__, 2 * __N__ + 1> chi = chiValues(lambda,covariance,noiseCov,error);
 	//sigmaQuats.m: 34-70
 	Eigen::MatrixXd possQuats = quatDistribution(a,f,chi,attitudeQuat);
 
 	//runFilter.m: 175 (Eq. 35)
-	Eigen::MatrixXd possAngV = sigmaOmegas(gyroMeas, error, chi);
+	Eigen::Matrix<double, 3, 2 * __N__ + 1> possAngV = sigmaOmegas(gyroMeas, chi);
 	//runFilter.m: 183 (Eq. 34)
-	Eigen::MatrixXd possNewQuats = quatPropagate(possQuats,possAngV,gyroDt);
+	Eigen::Matrix<double, 4, 2 * __N__ + 1> possNewQuats = quatPropagate(possQuats,possAngV,gyroDt);
 	//runFilter.m: 189
 	Eigen::Matrix<double, __N__, 2 * __N__ + 1> possNewError = newChis(possNewQuats, chi, f, a);
 	//predictError.m: 18
 	Eigen::VectorXd predError = predictError(lambda, possNewError, noiseCov);
 	//predictError.m: 19-27
-	Eigen::MatrixXd predCov = predictCov(lambda, possNewError, noiseCov, 
+	Eigen::MatrixNd predCov = predictCov(lambda, possNewError, noiseCov, 
 		predError);
 	//runFilter.m: 213
 	Eigen::MatrixXd possExpMagMeas = sigmaMeas(possNewQuats, magField);

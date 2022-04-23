@@ -4,8 +4,6 @@
 #include "Eigen/Cholesky"
 
 
-#define N 6
-
 Eigen::Matrix3d attitudeMatrix(Eigen::Vector4d& quat);
 
 Eigen::MatrixXd chiValues(

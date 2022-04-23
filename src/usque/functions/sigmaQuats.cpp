@@ -1,21 +1,11 @@
-#include "Eigen/Cholesky"
+#include "usque.hpp"
 
-#define __N__ 6
-
-extern Eigen::Vector4d kalmanArrayInv(Eigen::Vector4d&& quat);
-
-extern Eigen::Vector4d kalmanArrayMult(
-	Eigen::Vector4d&& vecLeft, 
-	Eigen::Vector4d& vecRight
-);
 
 /*
 	Corresponds to sigmaQuats:1-33
 	lambda = constant
 	covariance = 6x6 matrix
  */
-typedef Eigen::Matrix<double, __N__, __N__> MatrixNd;
-typedef Eigen::Vector<double, __N__> VectorNd;
 Eigen::Matrix<double, __N__, 2 * __N__ + 1> chiValues(
 	const int lambda, 
 	MatrixNd& covariance, 
