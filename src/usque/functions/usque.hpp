@@ -132,17 +132,17 @@ Eigen::Matrix<double, __N__, 2 * __N__ + 1> newChis(
         Results:
     predError is the predicted gyro error vector
     predCov is the predicted new covariance*/
-Eigen::VectorXd predictError(
-	int lambda, 
-	Eigen::MatrixXd possNewError, 
-	Eigen::MatrixXd noiseCov
+VectorNd predictError(
+	const int lambda, 
+	Eigen::Matrix<double, __N__, 2 * __N__ + 1>& possNewError, 
+	MatrixNd& noiseCov
 );
 
-Eigen::MatrixXd predictCov(
-	int lambda, 
-	Eigen::MatrixXd possNewError, 
-	Eigen::MatrixXd noiseCov, 
-	Eigen::VectorXd predError
+MatrixNd predictCov(
+	const int lambda, 
+	Eigen::Matrix<double, __N__, 2 * __N__ + 1>& possNewError, 
+	MatrixNd& noiseCov, 
+	VectorNd& predError
 );
 
 /*  predictMeas.m
@@ -181,7 +181,8 @@ Eigen::Matrix<double, 4, 2 * __N__ + 1> quatDistribution(
 Eigen::Matrix<double, 4, 2 * __N__ + 1> quatPropagate(
 	Eigen::Matrix<double, 4, 2 * __N__ + 1>& possQuats, 
 	Eigen::Matrix<double, 3, 2 * __N__ + 1>& possAngV, 
-
+	double gyroDt
+);
 
 /*  quatUpdate.m
 	quatUpdate(error,f,a,possNewQuats,n)

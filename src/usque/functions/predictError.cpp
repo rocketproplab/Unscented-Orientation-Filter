@@ -1,9 +1,5 @@
-#include "Eigen/Cholesky"
+#include "usque.hpp"
 
-#define __N__ 6
-
-typedef Eigen::Vector<double, __N__> VectorNd;
-typedef Eigen::Matrix<double, __N__, __N__> MatrixNd;
 //predictError.m: 18
 VectorNd predictError(
 	const int lambda, 
@@ -18,7 +14,7 @@ VectorNd predictError(
 }
 
 //predictError.m: 19-27
-Eigen::MatrixXd predictCov(
+MatrixNd predictCov(
 	const int lambda, 
 	Eigen::Matrix<double, __N__, 2 * __N__ + 1>& possNewError, 
 	MatrixNd& noiseCov, 
