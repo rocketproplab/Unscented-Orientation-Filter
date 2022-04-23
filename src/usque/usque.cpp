@@ -24,8 +24,6 @@ Eigen::Matrix3d attitudeMatrix(Eigen::Vector4d& quat) {
 	result = eps * psi;
 }
 
-/* The filterStep() function is one iteration of the runFilter() function in runFilter.m. */
-
 // JNIEXPORT void JNICALL
 // Java_USQUE_filterStep(JNIEnv *env, jclass obj, jstring json_params) {
 void filterStep(
@@ -260,8 +258,11 @@ Eigen::Vector3d predictMeas(int lambda, Eigen::MatrixXd possExpMagMeas) {
 	return predMagMeas;
 }
 
-Eigen::MatrixXd innovationCov(Eigen::MatrixXd possExpMagMeas, 
-	Eigen::Vector3d predMagMeas, int lambda, double sigma_mag) {
+Eigen::MatrixXd innovationCov(
+	Eigen::MatrixXd <double, 3, 2 * __N__ + 1>&  possExpMagMeas, 
+	Eigen::Vector3d & predMagMeas,
+	int lambda,
+	double sigma_mag) {
 	using namespace Eigen;
 	const int n = 6;
 	MatrixXd covSum;
@@ -278,7 +279,8 @@ Eigen::MatrixXd innovationCov(Eigen::MatrixXd possExpMagMeas,
 }
 
 Eigen::MatrixXd crossCorr(Eigen::MatrixXd possNewError,
-	Eigen::VectorXd predError, Eigen::MatrixXd possExpMagMeas,
+	Eigen::VectorXd predError,
+	Eigen::MatrixXd <double, 3, 2 * __N__ + 1>& possExpMagMeas,
 	Eigen::Vector3d predMagMeas, int lambda) {
 	using namespace Eigen;
 	const int n = 6;
