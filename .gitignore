@@ -4,3 +4,5 @@ codegen/
 # Output
 out/
 **.o
+
+.vscode/

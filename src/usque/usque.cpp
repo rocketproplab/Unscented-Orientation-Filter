@@ -24,6 +24,8 @@ Eigen::Matrix3d attitudeMatrix(Eigen::Vector4d& quat) {
 	result = eps * psi;
 }
 
+/* The filterStep() function is one iteration of the runFilter() function in runFilter.m. */
+
 // JNIEXPORT void JNICALL
 // Java_USQUE_filterStep(JNIEnv *env, jclass obj, jstring json_params) {
 void filterStep(
