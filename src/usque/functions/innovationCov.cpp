@@ -1,29 +1,20 @@
 #include "usque.hpp"
 
-Eigen::MatrixXd innovationCov(
-	Eigen::MatrixXd possExpMagMeas, 
-	Eigen::Vector3d predMagMeas, 
-	int lambda, 
-	double sigma_mag
-) {
-	const int n = 6;
-	MatrixXd covSum;
-	covSum << lambda*(possExpMagMeas.col(2*n) - predMagMeas) * 
-		(possExpMagMeas.col(2*n) - predMagMeas).transpose();
+Eigen::Matrix3d innovationCov(
+    Eigen::Matrix<double, 3, 2 * __N__ + 1>& possExpMagMeas, 
+	Eigen::Vector3d& predMagMeas,
+    int lambda,
+    double sigma_mag) {
+	Eigen::Matrix3d covSum;
+	covSum << lambda*(possExpMagMeas.col(2 * __N__) - predMagMeas) * 
+		(possExpMagMeas.col(2 * __N__) - predMagMeas).transpose();
 	
-	for(int i = 0; i < 2*n; i++) {
+	for(int i = 0; i < 2*__N__; i++) {
 		covSum = covSum + (possExpMagMeas.col(i) - predMagMeas) * 
 			0.5*(possExpMagMeas.col(i) - predMagMeas).transpose();
 	}
 
-	return covSum/(n + lambda) + (sigma_mag*sigma_mag) * 
-		MatrixXd::Identity(3,3);
+	return covSum / (__N__ + lambda) + (sigma_mag*sigma_mag) * 
+		Eigen::Matrix3d::Identity();
 }
-Eigen::MatrixXd innovationCov(
-	Eigen::Matrix<double, 3, 2 * __N__ + 1>& possExpMagMeas, 
-	Eigen::Vector3d& predMagMeas, 
-	int lambda, 
-	double sigma_mag
-) {
 
-}

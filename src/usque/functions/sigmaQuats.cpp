@@ -6,7 +6,7 @@
 	lambda = constant
 	covariance = 6x6 matrix
  */
-Eigen::Matrix<double, __N__, 2 * __N__ + 1> chiValues(
+MatrixErr6 chiValues(
 	const int lambda, 
 	MatrixNd& covariance, 
 	MatrixNd& noiseCov, 
@@ -28,7 +28,7 @@ Eigen::Matrix<double, __N__, 2 * __N__ + 1> chiValues(
 Eigen::Matrix<double, 4, 2 * __N__ + 1> quatDistribution(
 	int a, 
 	int f, 
-	MatrixNd& chi, 
+	MatrixErr6& chi, 
 	Eigen::Vector4d& attitudeQuat
 ) {
 	Eigen::Matrix<double, 4, 2 * __N__> dqK;

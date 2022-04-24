@@ -1,7 +1,7 @@
 #include "usque.hpp"
 
 Eigen::Matrix<double, 3, 2 * __N__ + 1> sigmaMeas(
-	Eigen::Matrix4d& possNewQuats, 
+	Eigen::Matrix<double, 4, 2 * __N__ + 1>& possNewQuats, 
 	Eigen::Vector3d& magField 
 ) {
 	Eigen::Matrix<double, 3, 2 * __N__ + 1> possExpMagMeas;

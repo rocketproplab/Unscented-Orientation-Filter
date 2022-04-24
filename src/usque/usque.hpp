@@ -163,7 +163,7 @@ Eigen::Vector3d predictMeas(
 Eigen::Matrix<double, 4, 2 * __N__ + 1> quatDistribution(
 	int a, 
 	int f, 
-	MatrixNd& chi, 
+	MatrixErr6& chi, 
 	Eigen::Vector4d& attitudeQuat
 );
 
@@ -220,7 +220,7 @@ Eigen::Vector4d quatUpdate(
       this location and our possible orientations after the last
       rotation. */
 Eigen::Matrix<double, 3, 2 * __N__ + 1> sigmaMeas(
-	Eigen::Matrix3d& possNewQuats, 
+	Eigen::Matrix<double, 4, 2 * __N__ + 1>& possNewQuats, 
 	Eigen::Vector3d& magField 
 );
 
