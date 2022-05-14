@@ -1,12 +1,15 @@
 #include "usque.hpp"
 
-Eigen::Matrix<double, 4, 2 * __N__ + 1> quatPropagate(
-	Eigen::Matrix<double, 4, 2 * __N__ + 1>& possQuats, 
-	Eigen::Matrix<double, 3, 2 * __N__ + 1>& possAngV, 
+namespace RPL {
+namespace USQUE {
+
+Matrix_4x13d quatPropagate(
+	Matrix_4x13d& possQuats, 
+	Matrix_3x13d& possAngV, 
 	double gyroDt
 ) {
-	Eigen::Matrix<double, 4, 2 * __N__ + 1> possNewQuats;
-	for(int i = 0; i < 2 * __N__ + 1; i++) {
+	Matrix_4x13d possNewQuats;
+	for(int i = 0; i < 2 * SIZE + 1; i++) {
 		Eigen::Vector3d psiK = sin(0.5*gyroDt*possAngV.col(i).norm())*
 			possAngV.col(i)/possAngV.col(i).norm();
 		Eigen::Matrix4d omega;
@@ -18,4 +21,7 @@ Eigen::Matrix<double, 4, 2 * __N__ + 1> quatPropagate(
 		possNewQuats.col(i) << omega*possQuats.col(i);
 	}
 	return possNewQuats;
+}
+
+}
 }

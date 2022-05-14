@@ -1,12 +1,19 @@
 #include "usque.hpp"
 
-Eigen::Matrix<double, 3, 2 * __N__ + 1> sigmaOmegas(
+namespace RPL {
+namespace USQUE {
+
+Matrix_3x13d sigmaOmegas(
 	Eigen::Vector3d& gyroMeas, 
-	Eigen::Matrix<double, __N__, 2 * __N__ + 1>& chi
+	Matrix_6x13d& chi
 ) {
 	// cerr << "entered sigmaOmegas" << endl;
-	Eigen::Matrix<double, 3, 2 * __N__ + 1> possAngV;
+	Matrix_3x13d possAngV;
 	//Note: bottom 3 rows are the errors.
-	possAngV << gyroMeas.replicate<1,2 * __N__ + 1>() - chi.bottomRows(3);
+	possAngV << gyroMeas.replicate<1,2 * SIZE + 1>() - chi.bottomRows(3);
 	return possAngV;
+
+}
+
+}
 }

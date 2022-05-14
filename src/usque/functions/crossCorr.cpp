@@ -1,20 +1,26 @@
 #include "usque.hpp"
 
-Eigen::Matrix<double, 6, 3> crossCorr(
-	MatrixErr6& possNewError, //6x13
-	VectorNd& predError, //6
-	Eigen::Matrix<double, 3, 2 * __N__ + 1>& possExpMagMeas, //3x13
+namespace RPL {
+namespace USQUE {
+
+Matrix_6x3d crossCorr(
+	Matrix_6x13d& possNewError, //6x13
+	Vector6d& predError, //6
+	Matrix_3x13d& possExpMagMeas, //3x13
 	Eigen::Vector3d& predMagMeas, //3
 	const int lambda
 ) {
-	Eigen::Matrix<double, 6, 3> covSum;
-	covSum << lambda * (possNewError.col(2 * __N__) - predError) * 
-		(possExpMagMeas.col(2 * __N__) - predMagMeas).transpose();
+	Matrix_6x3d covSum;
+	covSum << lambda * (possNewError.col(2 * SIZE) - predError) * 
+		(possExpMagMeas.col(2 * SIZE) - predMagMeas).transpose();
 	
-	for(int i = 0; i < 2 * __N__; i++) {
+	for(int i = 0; i < 2 * SIZE; i++) {
 		covSum = covSum + (possNewError.col(i) - predError) * 
 			0.5*(possExpMagMeas.col(i) - predMagMeas).transpose();
 	}
 
-	return covSum/(__N__ + lambda);
+	return covSum/(SIZE + lambda);
+}
+
+}
 }

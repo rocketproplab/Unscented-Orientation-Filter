@@ -1,30 +1,36 @@
 #include "usque.hpp"
+namespace RPL {
+namespace USQUE {
+
 
 //predictError.m: 18
-VectorNd predictError(
+Vector6d predictError(
 	const int lambda, 
-	Eigen::Matrix<double, __N__, 2 * __N__ + 1>& possNewError, 
-	MatrixNd& noiseCov
+	Eigen::Matrix<double, SIZE, 2 * SIZE + 1>& possNewError, 
+	Matrix_6x6d& noiseCov
 ) {
-	VectorNd predError;
-	predError << (lambda * possNewError.col(2*__N__) + 0.5*possNewError.
-		leftCols(2 * __N__).rowwise().sum())/(__N__ + lambda);
+	Vector6d predError;
+	predError << (lambda * possNewError.col(2*SIZE) + 0.5*possNewError.
+		leftCols(2 * SIZE).rowwise().sum())/(SIZE + lambda);
 	// cerr << "predError: " << endl << predError << endl;
 	return predError;
 }
 
 //predictError.m: 19-27
-MatrixNd predictCov(
+Matrix_6x6d predictCov(
 	const int lambda, 
-	Eigen::Matrix<double, __N__, 2 * __N__ + 1>& possNewError, 
-	MatrixNd& noiseCov, 
-	VectorNd& predError
+	Eigen::Matrix<double, SIZE, 2 * SIZE + 1>& possNewError, 
+	Matrix_6x6d& noiseCov, 
+	Vector6d& predError
 ) {
-	Eigen::Matrix<double, __N__, 2 * __N__> intermediate;
-	intermediate = possNewError.leftCols(2 * __N__) - predError.replicate<1,2 * __N__>();
-	MatrixNd predCov;
-	predCov << (lambda*(possNewError.col(2*__N__) - predError)*(possNewError.
-		col(2*__N__) - predError).transpose() + 0.5*intermediate*intermediate.
-		transpose())/(__N__ + lambda) + noiseCov;
+	Eigen::Matrix<double, SIZE, 2 * SIZE> intermediate;
+	intermediate = possNewError.leftCols(2 * SIZE) - predError.replicate<1,2 * SIZE>();
+	Matrix_6x6d predCov;
+	predCov << (lambda*(possNewError.col(2*SIZE) - predError)*(possNewError.
+		col(2*SIZE) - predError).transpose() + 0.5*intermediate*intermediate.
+		transpose())/(SIZE + lambda) + noiseCov;
 	return predCov;
+}
+
+}
 }

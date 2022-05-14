@@ -1,12 +1,10 @@
-#include "USQUE.h"
 #include "filter_step.h"
 #include <cstdlib>
 #include <iostream>
-#include "lib/json.hpp"
-#include "lib/Eigen/Cholesky"
-#include "lib/Eigen/LU"
+#include "yaap.hpp"
+#include "Eigen/Cholesky"
+#include "Eigen/LU"
 
-using namespace std;
 int main(int argc, char* argv[]) {
     string fileName = "imu_params.txt";  
     // Check the number of parameters
@@ -36,3 +34,4 @@ int main(int argc, char* argv[]) {
 	cerr << "hey" << endl;
 
 
+}

@@ -1,49 +1,53 @@
 #include "usque.hpp"
-
+#include "Eigen/Cholesky"
+namespace RPL {
+namespace USQUE {
 
 /*
 	Corresponds to sigmaQuats:1-33
 	lambda = constant
 	covariance = 6x6 matrix
  */
-MatrixErr6 chiValues(
-	const int lambda, 
-	MatrixNd& covariance, 
-	MatrixNd& noiseCov, 
-	VectorNd& error
+Matrix_6x13d chiValues(
+	const int            lambda, 
+	Matrix_6x6d&         covariance, 
+	Matrix_6x6d&         noiseCov, 
+	Vector6d&            error
 ) {
-	MatrixNd cholInput = (__N__ + lambda)*(covariance + noiseCov);
+	Matrix_6x6d cholInput = (SIZE + lambda)*(covariance + noiseCov);
 
 	// take the Cholesky decomposition such that cholInput = sigma * 
 	//		transpose(sigma)
 	// same as in the paper, should not require transposing output as in matlab
-	MatrixNd sigma = cholInput.llt().matrixL();
-	Eigen::Matrix<double, __N__, 2 * __N__ + 1> chi;
-	VectorNd zeros;
-	chi << sigma, (-1*sigma), zeros;
-	chi = chi + error.replicate<1, 2 * __N__ + 1>();
+	Matrix_6x6d sigma = cholInput.llt().matrixL();
+	Matrix_6x13d chi;
+	chi << sigma, (-1*sigma), Vector6d::Zero();
+	chi = chi + error.replicate<1, 2 * SIZE + 1>();
 	return chi;
 }
 
-Eigen::Matrix<double, 4, 2 * __N__ + 1> quatDistribution(
+Matrix_4x13d quatDistribution(
 	int a, 
 	int f, 
-	MatrixErr6& chi, 
+	Matrix_6x13d& chi, 
 	Eigen::Vector4d& attitudeQuat
 ) {
-	Eigen::Matrix<double, 4, 2 * __N__> dqK;
-	for(int i = 0; i < 2 * __N__; i++) {
+	Matrix_4x13d dqK;
+	for(int i = 0; i < 2 * SIZE; i++) {
 		dqK(3,i) = (-a * chi.block(0,i,3,1).squaredNorm() + f * sqrt(f*f + 
 		(1-a*a)*chi.block(0,i,3,1).squaredNorm()))/(f*f + chi.block(0,i,3,1).
 			squaredNorm());
 		dqK.block(0,i,3,1) = ((a + dqK(3,i))/f)*chi.block(0,i,3,1);
 	}
 	// cerr << "dqK: \n" << dqK << endl;
-	Eigen::Matrix<double, 4, 2 * __N__ + 1> possQuats;
-	for(int i = 0; i < 2 * __N__; i++) {
+	Eigen::Matrix<double, 4, 2 * SIZE + 1> possQuats;
+	for(int i = 0; i < 2 * SIZE; i++) {
 		possQuats.col(i) = kalmanArrayMult(dqK.col(i), attitudeQuat);
 	}
-	possQuats.col(2* __N__) = attitudeQuat;
+	possQuats.col(2* SIZE) = attitudeQuat;
 	// cerr << "possQuats: " << endl << possQuats << endl;
 	return possQuats;
+}
+
+}
 }

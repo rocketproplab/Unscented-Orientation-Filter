@@ -1,25 +1,69 @@
 #ifndef USQUE_H
 	#define USQUE_H
-	#define __N__ 6
-	#include "Eigen/Cholesky"
+	#define SIZE 6
+	#include "Eigen/Core"
+namespace RPL {
+namespace USQUE {
 
 //Matrix is N x N, or 6x6
-typedef Eigen::Matrix<double, __N__, __N__> MatrixNd;
+typedef Eigen::Matrix<double, SIZE, SIZE> Matrix_6x6d;
 //Vector is size 6
-typedef Eigen::Vector<double, __N__> VectorNd;
+typedef Eigen::Vector<double, SIZE> Vector6d;
 //Matrix is (N x (2 * N + 1))
-typedef Eigen::Matrix<double, __N__, 2 * __N__ + 1> MatrixErr6; 
+typedef Eigen::Matrix<double, SIZE, 2 * SIZE + 1> Matrix_6x13d; 
+
+typedef Eigen::Matrix<double, 3, 2 * SIZE + 1> Matrix_3x13d;
+
+typedef Eigen::Matrix<double, 4, 2 * SIZE + 1> Matrix_4x13d;
+
+typedef Eigen::Matrix<double, 6, 3> Matrix_6x3d;
+
+typedef Eigen::Matrix<double, 3, 6> Matrix_3x6d;
+
+/*	
+	Run a step of the algorithm.
+
+	gyroDt: gyro sampling interval
+	sigma_bias:
+Input descriptions: gyroDt is the gyro sampling interval, sigma_bias is the
+	gyro bias standard deviation, sigma_noise is the gyro noise standard 
+	deviation sigma_mag is the magnetometer noise standard deviation, noiseCov
+	is the noise covariance, attitudeQuat is the initial orientation quaternion,
+	covariance is the estimated initial covariance, gyroBias is the estimated
+	initial gyro bias, gyroMeas and magMeas are gyroscope and magnetometer 
+	measurements, magField is the government provided expected magnetic field 
+	vector at our location (we can calculate this on the fly or pre-load onto 
+	the rocket). error is the estimated error vector.*/
+// TODO: what exactly is error
+void filterStep(
+	const double         gyroDt, 
+	const double         sigmaBias, 
+	const double         sigmaNoise, 
+	const double         sigmaMag, 
+	Matrix_6x6d&         noiseCov,
+	Eigen::Vector4d&     attitudeQuat, 
+	Matrix_6x6d&         covariance, 
+	Eigen::Vector3d&     gyroBias,
+	Eigen::Vector3d&     gyroMeas,
+	Eigen::Vector3d&     magMeas, 
+	Eigen::Vector3d&     magField,
+	Vector6d&            error
+);
+
 /*
 	Implemented in attitudeMatrix.cpp
 	quat: 4-vector
 	Returns: (3 * 3) matrix
  */
 Eigen::Matrix3d attitudeMatrix(
-	Eigen::Vector4d& quat
+	Eigen::Vector4d&     quat
 );
 
+/*
+	r-value reference version
+ */
 Eigen::Matrix3d attitudeMatrix(
-	Eigen::Vector4d&& quat
+	Eigen::Vector4d&&    quat
 );
 
 /*
@@ -29,30 +73,37 @@ Eigen::Matrix3d attitudeMatrix(
 	noiseCov: (N * N) matrix
 	Returns: (N * (2N + 1)) matrix.
  */
-MatrixErr6 chiValues(
-	const int lambda, 
-	MatrixNd& covariance, 
-	MatrixNd& noiseCov, 
-	VectorNd& error
+Matrix_6x13d chiValues(
+	const int            lambda, 
+	Matrix_6x6d&         covariance, 
+	Matrix_6x6d&         noiseCov, 
+	Vector6d&            error
 ); 
 
 /*
 	
  */
-Eigen::Matrix<double, 6, 3> crossCorr(
-	MatrixErr6& possNewError, //6x13
-	VectorNd& predError, //6
-	Eigen::Matrix<double, 3, 2 * __N__ + 1>& possExpMagMeas, //3x13
-	Eigen::Vector3d& predMagMeas, //3
-	const int lambda
+Matrix_6x3d crossCorr(
+	Matrix_6x13d&        possNewError, //6x13
+	Vector6d&            predError, //6
+	Matrix_3x13d&        possExpMagMeas, //3x13
+	Eigen::Vector3d&     predMagMeas, //3
+	const int            lambda
 );
 
-Eigen::Matrix3d crossMatrix(Eigen::Vector3d& vec);
+Eigen::Matrix3d crossMatrix(
+	Eigen::Vector3d&     vec
+);
 
-Eigen::Matrix3d crossMatrix(Eigen::Vector3d&& vec);
+Eigen::Matrix3d crossMatrix(
+	Eigen::Vector3d&&    vec
+);
+
+
+
 /*  crossMatrix returns the cross product matrix of the given vector
     vec is a 3-vector */
-Eigen::MatrixXd crossMatrix(Eigen::Vector3d vec);
+// Eigen::MatrixXd crossMatrix(Eigen::Vector3d vec);
 
 /*  innovationCov2.m
 	innovationCov2(possExpMagMeas,predMagMeas,lambda,sigma_mag,n)
@@ -63,11 +114,11 @@ Eigen::MatrixXd crossMatrix(Eigen::Vector3d vec);
     predMagMeas is the predicted magnetometer measurement at the location
     sigma_mag is the standard deviation of magnetometer noise
     lambda and n are constants*/
-Eigen::MatrixXd innovationCov(
-	Eigen::MatrixXd possExpMagMeas, 
-	Eigen::Vector3d predMagMeas, 
-	int lambda, 
-	double sigma_mag
+Eigen::Matrix3d innovationCov(
+	Matrix_3x13d&        possExpMagMeas, 
+	Eigen::Vector3d&     predMagMeas, 
+	const int            lambda, 
+	const double         sigma_mag
 );
 
 /*  kalmanArrayInv.m
@@ -75,10 +126,10 @@ Eigen::MatrixXd innovationCov(
     quat is the quaternion whose inverse should be found
     This uses the quaternion convention with the scalar cosine term 4th*/
 Eigen::Vector4d kalmanArrayInv(
-	Eigen::Vector4d& quat
+	Eigen::Vector4d&     quat
 );
 Eigen::Vector4d kalmanArrayInv(
-	Eigen::Vector4d&& quat
+	Eigen::Vector4d&&    quat
 );
 
 /*  kalmanArrayMult multiplies two quaternions using
@@ -88,22 +139,22 @@ Eigen::Vector4d kalmanArrayInv(
     quat is the quaternion such that:
     quat = q*p*/
 Eigen::Vector4d kalmanArrayMult(
-	Eigen::Vector4d& vecLeft, 
-	Eigen::Vector4d& vecRight
+	Eigen::Vector4d&     vecLeft, 
+	Eigen::Vector4d&     vecRight
 );
 Eigen::Vector4d kalmanArrayMult(
-	Eigen::Vector4d&& vecLeft, 
-	Eigen::Vector4d& vecRight
-);
-
-Eigen::Vector4d kalmanArrayMult(
-	Eigen::Vector4d& vecLeft, 
-	Eigen::Vector4d&& vecRight
+	Eigen::Vector4d&&    vecLeft, 
+	Eigen::Vector4d&     vecRight
 );
 
 Eigen::Vector4d kalmanArrayMult(
-	Eigen::Vector4d&& vecLeft, 
-	Eigen::Vector4d&& vecRight
+	Eigen::Vector4d&     vecLeft, 
+	Eigen::Vector4d&&    vecRight
+);
+
+Eigen::Vector4d kalmanArrayMult(
+	Eigen::Vector4d&&    vecLeft, 
+	Eigen::Vector4d&&    vecRight
 );
 
 /*  newChis.m
@@ -116,11 +167,11 @@ Eigen::Vector4d kalmanArrayMult(
     n,f,a are constants and fine tuning values
         Result:
     possNewError are the possible new attitude error vectors*/
-Eigen::Matrix<double, __N__, 2 * __N__ + 1> newChis(
-	Eigen::Matrix<double, 4, 2 * __N__ + 1>& possNewQuats, 
-	Eigen::Matrix<double, __N__, 2 * __N__ + 1>& chi,
-	const int f, 
-	const int a
+Matrix_6x13d newChis(
+	Matrix_4x13d&        possNewQuats, 
+	Matrix_6x13d&        chi,
+	const int            f, 
+	const int            a
 ); 
 
 /*  predictError(lambda,possNewError,noiseCov,n)
@@ -132,17 +183,17 @@ Eigen::Matrix<double, __N__, 2 * __N__ + 1> newChis(
         Results:
     predError is the predicted gyro error vector
     predCov is the predicted new covariance*/
-VectorNd predictError(
-	const int lambda, 
-	Eigen::Matrix<double, __N__, 2 * __N__ + 1>& possNewError, 
-	MatrixNd& noiseCov
+Vector6d predictError(
+	const int            lambda, 
+	Matrix_6x13d&        possNewError, 
+	Matrix_6x6d&         noiseCov
 );
 
-MatrixNd predictCov(
-	const int lambda, 
-	Eigen::Matrix<double, __N__, 2 * __N__ + 1>& possNewError, 
-	MatrixNd& noiseCov, 
-	VectorNd& predError
+Matrix_6x6d predictCov(
+	const int            lambda, 
+	Matrix_6x13d&        possNewError, 
+	Matrix_6x6d&         noiseCov, 
+	Vector6d&            predError
 );
 
 /*  predictMeas.m
@@ -156,15 +207,15 @@ MatrixNd predictCov(
         Results:
     predMagMeas is the predicted magnetometer measurement*/
 Eigen::Vector3d predictMeas(
-	int lambda, 
-	Eigen::MatrixXd possExpMagMeas
+	const int            lambda, 
+	Matrix_3x13d&        possExpMagMeas
 );
 
-Eigen::Matrix<double, 4, 2 * __N__ + 1> quatDistribution(
-	int a, 
-	int f, 
-	MatrixErr6& chi, 
-	Eigen::Vector4d& attitudeQuat
+Matrix_4x13d quatDistribution(
+	const int            a, 
+	const int            f, 
+	Matrix_6x13d&        chi, 
+	Eigen::Vector4d&     attitudeQuat
 );
 
 /*  quatPropagate.m
@@ -178,10 +229,10 @@ Eigen::Matrix<double, 4, 2 * __N__ + 1> quatDistribution(
     gyroDt is the sampling interval in the gyro
         Results:
     possNewQuats is the array of propagated sigma quaternions */
-Eigen::Matrix<double, 4, 2 * __N__ + 1> quatPropagate(
-	Eigen::Matrix<double, 4, 2 * __N__ + 1>& possQuats, 
-	Eigen::Matrix<double, 3, 2 * __N__ + 1>& possAngV, 
-	double gyroDt
+Matrix_4x13d quatPropagate(
+	Matrix_4x13d&        possQuats, 
+	Matrix_3x13d&        possAngV, 
+	const double         gyroDt
 );
 
 /*  quatUpdate.m
@@ -199,10 +250,10 @@ Eigen::Matrix<double, 4, 2 * __N__ + 1> quatPropagate(
     attitudeQuat is the best estimate of the current spacecraft 
       orientation.*/
 Eigen::Vector4d quatUpdate(
-	VectorNd& error, 
-	const int f, 
-	const int a, 
-	Eigen::Matrix<double, 4, 2 * __N__ + 1>& possNewQuats
+	Vector6d&            error, 
+	const int            f, 
+	const int            a, 
+	Matrix_4x13d&        possNewQuats
 );
 
 /*  sigmaMeas.m
@@ -219,9 +270,9 @@ Eigen::Vector4d quatUpdate(
       think we can get based on what we think is the magnetic field at
       this location and our possible orientations after the last
       rotation. */
-Eigen::Matrix<double, 3, 2 * __N__ + 1> sigmaMeas(
-	Eigen::Matrix<double, 4, 2 * __N__ + 1>& possNewQuats, 
-	Eigen::Vector3d& magField 
+Matrix_3x13d sigmaMeas(
+	Matrix_4x13d&        possNewQuats, 
+	Eigen::Vector3d&     magField 
 );
 
 // sigmaOmegas.m
@@ -238,9 +289,11 @@ Eigen::Matrix<double, 3, 2 * __N__ + 1> sigmaMeas(
       -1)
         Results:
     possAngV is the possible true angular velocities*/
-Eigen::Matrix<double, 3, 2 * __N__ + 1> sigmaOmegas(
-	Eigen::Vector3d& gyroMeas, 
-	MatrixErr6& chi
+Matrix_3x13d sigmaOmegas(
+	Eigen::Vector3d&     gyroMeas, 
+	Matrix_6x13d&        chi
 );
 
+}
+}
 #endif

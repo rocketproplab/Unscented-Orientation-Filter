@@ -1,10 +1,13 @@
 #include "usque.hpp"
 
+namespace RPL {
+namespace USQUE {
+
 Eigen::Vector4d quatUpdate(
-	VectorNd& error, 
+	Vector6d& error, 
 	const int f, 
 	const int a, 
-	Eigen::Matrix<double, 4, 2 * __N__ + 1>& possNewQuats
+	Matrix_4x13d& possNewQuats
 ) {
 	Eigen::Vector4d update;
 	double fourVal = (-a * error.head(3).squaredNorm() + f * sqrt(f*f + 
@@ -12,5 +15,8 @@ Eigen::Vector4d quatUpdate(
 		error.head(3).squaredNorm());
 	update.head(3) << ((a + fourVal) / f)*error.head(3);
 
-	return kalmanArrayMult(update,possNewQuats.col(2 * __N__));
+	return kalmanArrayMult(update,possNewQuats.col(2 * SIZE));
+}
+
+}
 }

@@ -6,3 +6,5 @@ out/
 **.o
 
 .vscode/
+
+src/experiments
