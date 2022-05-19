@@ -7,6 +7,7 @@
 #define ATT_ERR PI * PI / (360 * 360)
 #define BIAS_ERR PI * PI / (3.24E6 * 3.24E6)
 
+using namespace RPL;
 
 /*
 	Testbench: Simulation
@@ -44,14 +45,59 @@ int main(int argc, char *argv[])
 	double sigmaNoise = 0.31623e-6;
 	double sigmaMag = 50e-9;
 	//Constants and fine tuning
+/*	Fine tuning parameters described in the research paper. Recommmended values
+	are a=1, lambda=1, and f=4 */ 
 	const int a = 1;
 	const int lambda = 1;
 	const int f = 2 * (a + 1);
 	const int iterations = runTime / gyroDt;
 
+	//Simulation variables (Eigen)
+	Eigen::Vector3d idealAngV; //The ideal orientation
+	Eigen::Vector4d trueOrient; //The real orientation
+	Eigen::Vector3d gyroMeas; //Current gyro reading
+	Eigen::Vector3d bias; //defined in readGyro.m; TODO: document better
+	Eigen::Vector3d magField; //magnetic field in WMM
+	Eigen::Vector3d magMeas; //Current magnetometer value
+	//Simulation records
+	std::vector<double> gyroMeass;      //Store gyro readings here. Triples.
+	std::vector<double> idealGyroVals; //Store "ideal" gyro values here. Triples.
+	std::vector<double> errorQuats;    //Store error quaternions here. Quats.
+	std::vector<double> magVals;       //Store magnetic field readings. Triples.
+	//Allocate space now to make simulation faster.
+	gyroMeass.reserve(3 * iterations);
+	idealGyroVals.reserve(3 * iterations);
+	errorQuats.reserve(4 * iterations);
+
 	//Run Filter
 	for(int i = 0; i < iterations; ++i) {
-		filterStep(gyroDt, 
+		//Generate the actual ideal angular velocity of the rocket, and
+		//precise current orientation of the rocket.
+		idealpath(rotTime, rotVec, gyroDt, trueOrient, idealAngV);
+		//Record the ideal gyro value.
+		idealGyroVals.push_back(idealAngV(0));
+		idealGyroVals.push_back(idealAngV(1));
+		idealGyroVals.push_back(idealAngV(2));
+
+		//Read the gyro and record it.
+		readGyro(idealAngV, bias, sigmaBias, sigmaNoise, gyroMeas);
+		gyroMeass.push_back(gyroMeas(0));
+		gyroMeass.push_back(gyroMeas(1));
+		gyroMeass.push_back(gyroMeas(2));
+
+		//Read World Magnetic Model.
+		readWMM(magField);
+
+		//Read magnetometer, and record it
+		readMag(trueOrient, magField, magMeas);
+		magVals.push_back(magVal(0));
+		magVals.push_back(magVal(1));
+		magVals.push_back(magVal(2));
+
+		filterStep(a, 
+		           lambda, 
+		           f,
+		           gyroDt,
 		           sigmaBias, 
 		           sigmaNoise,
 		           sigmaMag, 
@@ -62,10 +108,9 @@ int main(int argc, char *argv[])
 		           gyroMeas,
 		           magMeas,
 		           magField,
-		           error
-		);
+		           error);
 		//Output error
-
+		
 	}
 	return 0;
 }

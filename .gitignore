@@ -1,10 +1,17 @@
-codegen/
+#File extensions
 **.bak
-
-# Output
-out/
 **.o
 
-.vscode/
+#Libraries
+lib/
+# Output
+codegen/
+out/
 
+# CMake
+build/
+
+#VSCode
+.vscode/
+# Experimental stuff for development
 src/experiments

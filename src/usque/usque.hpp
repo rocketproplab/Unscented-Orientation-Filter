@@ -2,8 +2,7 @@
 	#define USQUE_H
 	#define SIZE 6
 	#include "Eigen/Core"
-namespace RPL {
-namespace USQUE {
+namespace Usque {
 
 //Matrix is N x N, or 6x6
 typedef Eigen::Matrix<double, SIZE, SIZE> Matrix_6x6d;
@@ -20,6 +19,8 @@ typedef Eigen::Matrix<double, 6, 3> Matrix_6x3d;
 
 typedef Eigen::Matrix<double, 3, 6> Matrix_3x6d;
 
+typedef Eigen::Matrix<double, 3, 4> Matrix_3x4d;
+typedef Eigen::Matrix<double, 4, 3> Matrix_4x3d;
 /*	
 	Run a step of the algorithm.
 
@@ -294,6 +295,5 @@ Matrix_3x13d sigmaOmegas(
 	Matrix_6x13d&        chi
 );
 
-}
 }
 #endif

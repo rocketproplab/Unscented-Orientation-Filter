@@ -3,7 +3,7 @@
 A MATLAB implementation of Crassidis and Markley's Unscented Quaternion Estimator (USQUE) for spacecraft orientation, with sensor measurment simulations and performance comparisons to naive quaternion integration. This unscented filter reads 3-axis gyroscope and magnetometer data, and estimates and removes noise and bias in the gyroscope data by comparing the magnetometer measurements to the expected measurements from the world magnetic model. This filter uses quaternions and modified Rodriguez parameters to keep track of the orientation of the spacecraft. You can find the research paper this is based on [here!](https://doi.org/10.2514/2.5102)
 
 
-## Using this code
+## Using this code (Matlab)
 
 Download this code and open testFilter.m and runFilter.m in the MATLAB IDE. Try running testFilter.m
 
@@ -21,8 +21,22 @@ If we can spin the gyro at an exact rate known to us (keeping it perfectly still
 
 The paper says "Note that the actual magnetic field errors have systematic components, but these are not relevant to the present filter comparisons."
 
+
+# Building For C++
+This project relies on `Eigen 3.4.0`, which is included in the repository (this may change in the future).
+
+To build using CMake, use
+```
+cmake -S . -B build
+```
+
 # Roadmap
 Currently in the process of implementing USQUE in C++.
 
 1. Implementation
+	1. Simulate inputs: read gyro, WMM, etc.
+	2. Extract outputs
+
 2. Testing
+	1. Unit tests for all functions.
+	2. Integration Tests
