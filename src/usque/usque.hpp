@@ -1,28 +1,21 @@
-#ifndef USQUE_H
-	#define USQUE_H
+#ifndef USQUE_HPP
+	#define USQUE_HPP
 	#define SIZE 6
-	#include "Eigen/Core"
+	#include "Eigen/Dense"
 namespace Usque {
+//Convenient typedefs
 
-//Matrix is N x N, or 6x6
-typedef Eigen::Matrix<double, SIZE, SIZE> Matrix_6x6d;
-//Vector is size 6
-typedef Eigen::Vector<double, SIZE> Vector6d;
-//Matrix is (N x (2 * N + 1))
+typedef Eigen::Matrix<double, SIZE, SIZE>         Matrix_6x6d;
+typedef Eigen::Vector<double, SIZE>               Vector6d;
 typedef Eigen::Matrix<double, SIZE, 2 * SIZE + 1> Matrix_6x13d; 
-
-typedef Eigen::Matrix<double, 3, 2 * SIZE + 1> Matrix_3x13d;
-
-typedef Eigen::Matrix<double, 4, 2 * SIZE + 1> Matrix_4x13d;
-
-typedef Eigen::Matrix<double, 6, 3> Matrix_6x3d;
-
-typedef Eigen::Matrix<double, 3, 6> Matrix_3x6d;
-
-typedef Eigen::Matrix<double, 3, 4> Matrix_3x4d;
-typedef Eigen::Matrix<double, 4, 3> Matrix_4x3d;
+typedef Eigen::Matrix<double, 3, 2 * SIZE + 1>    Matrix_3x13d;
+typedef Eigen::Matrix<double, 4, 2 * SIZE + 1>    Matrix_4x13d;
+typedef Eigen::Matrix<double, 6, 3>               Matrix_6x3d;
+typedef Eigen::Matrix<double, 3, 6>               Matrix_3x6d;
+typedef Eigen::Matrix<double, 3, 4>               Matrix_3x4d;
+typedef Eigen::Matrix<double, 4, 3>               Matrix_4x3d;
 /*	
-	Run a step of the algorithm.
+	Run a step of the algorithm. This is the workhorse of the library.
 
 	gyroDt: gyro sampling interval
 	sigma_bias:
@@ -37,19 +30,21 @@ Input descriptions: gyroDt is the gyro sampling interval, sigma_bias is the
 	the rocket). error is the estimated error vector.*/
 // TODO: what exactly is error
 void filterStep(
-	const double         gyroDt, 
-	const double         sigmaBias, 
-	const double         sigmaNoise, 
-	const double         sigmaMag, 
-	Matrix_6x6d&         noiseCov,
-	Eigen::Vector4d&     attitudeQuat, 
-	Matrix_6x6d&         covariance, 
-	Eigen::Vector3d&     gyroBias,
-	Eigen::Vector3d&     gyroMeas,
-	Eigen::Vector3d&     magMeas, 
-	Eigen::Vector3d&     magField,
-	Vector6d&            error
-);
+	const int        a,
+	const int        lambda,
+	const int        f,
+	const double     gyroDt, 
+	const double     sigmaBias, 
+	const double     sigmaNoise, 
+	const double     sigmaMag, 
+	Matrix_6x6d&     noiseCov, 
+	Eigen::Vector4d& attitudeQuat, 
+	Matrix_6x6d&     covariance, 
+	Eigen::Vector3d& gyroMeas,
+	Eigen::Vector3d& magMeas, 
+	Eigen::Vector3d& magField,
+	Vector6d& error
+); 
 
 /*
 	Implemented in attitudeMatrix.cpp

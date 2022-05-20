@@ -70,47 +70,5 @@ int main(int argc, char *argv[])
 	errorQuats.reserve(4 * iterations);
 
 	//Run Filter
-	for(int i = 0; i < iterations; ++i) {
-		//Generate the actual ideal angular velocity of the rocket, and
-		//precise current orientation of the rocket.
-		idealpath(rotTime, rotVec, gyroDt, trueOrient, idealAngV);
-		//Record the ideal gyro value.
-		idealGyroVals.push_back(idealAngV(0));
-		idealGyroVals.push_back(idealAngV(1));
-		idealGyroVals.push_back(idealAngV(2));
-
-		//Read the gyro and record it.
-		readGyro(idealAngV, bias, sigmaBias, sigmaNoise, gyroMeas);
-		gyroMeass.push_back(gyroMeas(0));
-		gyroMeass.push_back(gyroMeas(1));
-		gyroMeass.push_back(gyroMeas(2));
-
-		//Read World Magnetic Model.
-		readWMM(magField);
-
-		//Read magnetometer, and record it
-		readMag(trueOrient, magField, magMeas);
-		magVals.push_back(magVal(0));
-		magVals.push_back(magVal(1));
-		magVals.push_back(magVal(2));
-
-		filterStep(a, 
-		           lambda, 
-		           f,
-		           gyroDt,
-		           sigmaBias, 
-		           sigmaNoise,
-		           sigmaMag, 
-		           noiseCov,
-		           attitudeQuat,
-		           covariance,
-		           gyroBias,
-		           gyroMeas,
-		           magMeas,
-		           magField,
-		           error);
-		//Output error
-		
-	}
 	return 0;
 }

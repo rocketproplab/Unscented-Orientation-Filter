@@ -11,8 +11,10 @@ FetchContent_MakeAvailable(googletest)
 
 enable_testing()
 
-
-add_executable(playground playground.cpp)
-target_link_libraries(playground gtest_main)
+add_executable(Example example.cpp)
+target_link_libraries(Example 
+	PRIVATE gtest_main
+	PUBLIC Usque
+)
 include(GoogleTest)
-gtest_discover_tests(playground)
+gtest_discover_tests(Example)

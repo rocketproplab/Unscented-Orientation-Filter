@@ -23,12 +23,45 @@ The paper says "Note that the actual magnetic field errors have systematic compo
 
 
 # Building For C++
-This project relies on `Eigen 3.4.0`, which is included in the repository (this may change in the future).
+This project relies on `Eigen 3.4.0`.
 
-To build using CMake, use
-```
+To build using CMake, use the following commands.
+```bash
 cmake -S . -B build
+cmake --build build
 ```
+To run unit tests, use the command after building the CMake build directory:
+```bash
+cd build/tests && ctest
+```
+
+## Simulation
+The simulation class is found in `src/simulation`. To use it: 
+1. Construct a `Usque::Simulation` instance. Set its parameters, either though the explicit constructor or using the builder pattern (TODO).
+2. Call `instance.run()`. Note that you should not modify parameters during this stage, and this method should only be called once.
+3. Call `instance.output()`. This outputs the simulation results into a CSV file.
+
+### Example
+This code has not been tested yet. (TODO: Implement this usage pattern)
+
+```cpp
+#include "simulation.hpp"
+
+int main() {
+	//Create a simulation with default params
+	Simulation sim;
+	//Run.
+	sim.run();
+	//Output results to path/to/result as a CSV file.
+	sim.output("path/to/result");
+}
+
+```
+
+# License
+Eigen 3.4 uses the [MPL 2.0 License](https://www.mozilla.org/en-US/MPL/2.0/).
+
+GoogleTest uses the [BSD 3-Clause "New" or "Revised" License](https://github.com/google/googletest/blob/main/LICENSE).
 
 # Roadmap
 Currently in the process of implementing USQUE in C++.

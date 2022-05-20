@@ -22,6 +22,12 @@ Eigen::Matrix3d attitudeMatrix(Eigen::Vector4d& quat) {
 	return eps * psi;
 }
 
+Eigen::Matrix3d attitudeMatrix(
+	Eigen::Vector4d&&    quat
+) {
+	return attitudeMatrix(quat);
+}
+
 /*
  * crossCorr.m
  */
@@ -42,6 +48,22 @@ Matrix_6x3d crossCorr(
 	}
 
 	return covSum/(SIZE + lambda);
+}
+
+Eigen::Matrix3d crossMatrix(
+	Eigen::Vector3d&     vec
+) {
+	Eigen::Matrix3d result;
+	result <<         0, -vec(3,1),  vec(2,1),
+	           vec(3,1),         0, -vec(1,1), 
+			  -vec(2,1),  vec(1,1),         0;
+	return result;
+}
+
+Eigen::Matrix3d crossMatrix(
+	Eigen::Vector3d&&    vec
+) {
+	return crossMatrix(vec);
 }
 
 /*
@@ -80,22 +102,59 @@ Eigen::Vector4d kalmanArrayMult(
 	return prodVec;
 }
 
+Eigen::Vector4d kalmanArrayMult(
+	Eigen::Vector4d& vecLeft,
+	Eigen::Vector4d&& vecRight
+) {
+	return kalmanArrayMult(vecLeft, vecRight);
+}
+
+Eigen::Vector4d kalmanArrayMult(
+	Eigen::Vector4d&& vecLeft,
+	Eigen::Vector4d& vecRight
+) {
+	return kalmanArrayMult(vecLeft, vecRight);
+}
+
+Eigen::Vector4d kalmanArrayMult(
+	Eigen::Vector4d&& vecLeft,
+	Eigen::Vector4d&& vecRight
+) {
+	return kalmanArrayMult(vecLeft, vecRight);
+}
+
+Eigen::Vector4d kalmanArrayInv(
+	Eigen::Vector4d&     quat
+) {
+	Eigen::Vector4d inverse;
+	inverse << -quat.head<3>(), quat(3);
+	double norm = quat.norm();
+	inverse = inverse / (norm * norm);
+	return inverse;
+}
+
+Eigen::Vector4d kalmanArrayInv(
+	Eigen::Vector4d&&    quat
+) {
+	return kalmanArrayInv(quat);
+}
+
 /*
  * newChis.m
  */
-Eigen::Matrix<double, SIZE, 2 * SIZE + 1> newChis(
-	Eigen::Matrix<double, 4, 2 * SIZE + 1>& possNewQuats, 
-	Eigen::Matrix<double, SIZE, 2 * SIZE + 1>& chi,
-	const int f, 
-	const int a
+Matrix_6x13d newChis(
+	Matrix_4x13d&        possNewQuats, 
+	Matrix_6x13d&        chi,
+	const int            f, 
+	const int            a
 ) {
-	Eigen::Matrix<double, 4, 2 * SIZE + 1> dqK1;
+	Matrix_4x13d dqK1;
 	for(int i = 0; i < 2 * SIZE + 1; i++) {
 		dqK1.col(i) << kalmanArrayMult(possNewQuats.col(i), kalmanArrayInv(
 			possNewQuats.col(2 * SIZE)));
 	}
 	// cerr << "dqK1 good" << endl;
-	Eigen::Matrix<double, SIZE, 2 * SIZE + 1> possNewError;
+	Matrix_6x13d possNewError;
 	for(int i = 0; i < 2*SIZE; i++) {
 		possNewError.block(0,i,3,1) << f*dqK1.block(0,i,3,1)/(a+dqK1(3,i));
 	}
@@ -276,13 +335,12 @@ void filterStep(
 	const int        lambda,
 	const int        f,
 	const double     gyroDt, 
-	const double     sigma_bias, 
-	const double     sigma_noise, 
-	const double     sigma_mag, 
+	const double     sigmaBias, 
+	const double     sigmaNoise, 
+	const double     sigmaMag, 
 	Matrix_6x6d&     noiseCov, 
 	Eigen::Vector4d& attitudeQuat, 
 	Matrix_6x6d&     covariance, 
-	Eigen::Vector3d& gyroBias,
 	Eigen::Vector3d& gyroMeas,
 	Eigen::Vector3d& magMeas, 
 	Eigen::Vector3d& magField,
@@ -318,7 +376,7 @@ void filterStep(
 
 	//runFilter.m: 224
 	Eigen::Matrix3d newInnovationCov = innovationCov(possExpMagMeas, 
-		predMagMeas, lambda, sigma_mag).inverse();
+		predMagMeas, lambda, sigmaMag).inverse();
 
 	//runFilter.m: 229
 	Matrix_6x3d newCrossCorrelation = crossCorr(possNewError, predError,

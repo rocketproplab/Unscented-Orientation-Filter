@@ -4,8 +4,8 @@
 # )
 
 add_library(Sim STATIC
-	meas.cpp 
 	utils.cpp 
+	simulation.cpp
 )
 target_link_libraries(Sim 
 	PUBLIC Eigen3::Eigen
