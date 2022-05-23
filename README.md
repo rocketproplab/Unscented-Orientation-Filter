@@ -49,7 +49,7 @@ This code has not been tested yet. (TODO: Implement this usage pattern)
 
 int main() {
 	//Create a simulation with default params
-	Simulation sim;
+	Usque::Simulation sim;
 	//Run.
 	sim.run();
 	//Output results to path/to/result as a CSV file.

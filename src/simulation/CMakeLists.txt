@@ -11,4 +11,5 @@ target_link_libraries(Sim
 	PUBLIC Eigen3::Eigen
 	PUBLIC Usque
 )
+# TODO: Add testing directive?
 target_include_directories(Sim PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

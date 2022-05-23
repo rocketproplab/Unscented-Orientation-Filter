@@ -395,7 +395,6 @@ void filterStep(
 	//runFilter.m: 251
 	attitudeQuat = quatUpdate(error, f, a, possNewQuats); // new attitudeQuat
 	//runFilter.m: 266
-	error.head(3) << 0,0,0;
 	
 
 }

@@ -47,4 +47,4 @@ Eigen::Vector4d rotQuat(
 );
 
 }
-#endif
+#endif //UTILS_HPP

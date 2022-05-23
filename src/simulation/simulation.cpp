@@ -1,23 +1,47 @@
 #include "simulation.hpp"
+#include <cstdio>
 #define PI 3.14159265359
+
 namespace Usque {
-	
-	
-	
-Simulation::Simulation() {
-	
+
+//Default params	
+Simulation::Simulation() :
+	rotTime(5400),
+	runTime(32400),
+	gyroDt(10),
+	sigmaBias(3.1623e-10),
+	sigmaNoise(0.31623e-6),
+	sigmaMag(50e-9),
+	a(1),
+	lambda(1),
+	f(4),
+	iterations(runTime / gyroDt),
+	hasFinished(false)
+{
+	/* Construct gyro bias */
+	const double GB = (PI / 6.48) * 1e-5;
+	gyroBias << GB, GB, GB;
+	/* Construct initial error */
+	error << 0, 0, 0, GB, GB, GB;
+	/* Construct covariance */
+	const double attErr = (PI / 360) * (PI / 360);
+	const double biasErr = (PI / 3.24e6) * (PI / 3.24e6);
+	covariance.diagonal() << attErr, attErr, attErr, biasErr, biasErr, biasErr;
 	/* Construct noise covariance */
 	const int A = sigmaNoise * sigmaNoise - (1 / 6) * sigmaBias * sigmaBias * gyroDt * gyroDt;
 	noiseCov.topLeftCorner<3, 3>() << Eigen::Matrix3d::Identity() * A * gyroDt / 2;
 	noiseCov.topRightCorner<3, 3>() << Eigen::Matrix3d::Zero();
 	noiseCov.bottomLeftCorner<3, 3>() << Eigen::Matrix3d::Zero();
 	noiseCov.bottomRightCorner<3, 3>() << Eigen::Matrix3d::Identity() * (sigmaBias * sigmaBias);
-	
-
-
+	/* Reserve space for simulation data */
+	gyroVals.reserve(3 * iterations);
+	idealGyroVals.reserve(3 * iterations);
+	magVals.reserve(3 * iterations);
+	errorQuats.reserve(4 * iterations);
 }
 
 void Simulation::run() {
+	// TODO: Could add synchronizing logic here
 	if(hasFinished) {
 		return;
 	}
@@ -61,9 +85,71 @@ void Simulation::run() {
 		           magField,
 		           error);
 		//Output error
-		
+		errorQuats.push_back(error(0));
+		errorQuats.push_back(error(1));
+		errorQuats.push_back(error(2));
+		errorQuats.push_back(error(3));
+		//Reset error (runFilter.m:266)
+		error.head<3>() << 0, 0, 0;
 	}
 }
+
+void Simulation::output(std::string& filename) {
+	output(filename.c_str());
+}
+
+
+void Simulation::output(const char* filename) {
+	//Output as a csv file
+	auto file = std::fopen(filename, "w");
+	std::fprintf(file, "Iteration,Time,idealX,idealY,idealZ,gyroX,gyroY,gyroZ,magX,magY,magZ,errorX,errorY,errorZ,errorW\n");
+	for(unsigned long i = 0; i < iterations; ++i) {
+		std::fprintf(file, "%lu,%lu,", i, (i * gyroDt)); //Time, Iteration
+		std::fprintf(file, "%.6lf,%.6lf,%.6lf,",        idealGyroVals[i * 3 + 0],  //idealX
+		                                                idealGyroVals[i * 3 + 1],  //idealY
+		                                                idealGyroVals[i * 3 + 2]); //idealZ
+		std::fprintf(file, "%.6lf,%.6lf,%.6lf,",        gyroVals[i * 3 + 0],       //gyroX
+		                                                gyroVals[i * 3 + 1],       //gyroY
+		                                                gyroVals[i * 3 + 2]);      //gyroZ
+		std::fprintf(file, "%.6lf,%.6lf,%.6lf,",        magVals[i * 3 + 0],        //magX
+		                                                magVals[i * 3 + 1],        //magY
+		                                                magVals[i * 3 + 2]);       //magZ
+		std::fprintf(file, "%.6lf,%.6lf,%.6lf,%.6lf\n", errorQuats[i * 4 + 0],     //errorQuatsX
+		                                                errorQuats[i * 4 + 1],     //errorQuatsY
+		                                                errorQuats[i * 4 + 2],     //errorQuatsZ
+		                                                errorQuats[i * 4 + 3]);    //errorQuatsW
+	}
+	//Flush so results are printed
+	std::fflush(file);
+	std::fclose(file);
+}
+
+
+void Simulation::printOutput() {
+	//Header
+	std::printf("Iteration,Time,idealX,idealY,idealZ,gyroX,gyroY,gyroZ,magX,magY,magZ,errorX,errorY,errorZ,errorW\n");
+	for(unsigned long i = 0; i < iterations; ++i) {
+		std::printf("%lu,%lu,", i, (i * gyroDt)); //Time, Iteration
+		std::printf("%.6lf,%.6lf,%.6lf,",        idealGyroVals[i * 3 + 0],  //idealX
+		                                         idealGyroVals[i * 3 + 1],  //idealY
+		                                         idealGyroVals[i * 3 + 2]); //idealZ
+		std::printf("%.6lf,%.6lf,%.6lf,",        gyroVals[i * 3 + 0],       //gyroX
+		                                         gyroVals[i * 3 + 1],       //gyroY
+		                                         gyroVals[i * 3 + 2]);      //gyroZ
+		std::printf("%.6lf,%.6lf,%.6lf,",        magVals[i * 3 + 0],        //magX
+		                                         magVals[i * 3 + 1],        //magY
+		                                         magVals[i * 3 + 2]);       //magZ
+		std::printf("%.6lf,%.6lf,%.6lf,%.6lf\n", errorQuats[i * 4 + 0],     //errorQuatsX
+		                                         errorQuats[i * 4 + 1],     //errorQuatsY
+		                                         errorQuats[i * 4 + 2],     //errorQuatsZ
+		                                         errorQuats[i * 4 + 3]);    //errorQuatsW
+	}
+	//Flush so results are printed
+	std::fflush(stdout);
+
+}
+
+
 /*
  * Simulate instrument readings
  */

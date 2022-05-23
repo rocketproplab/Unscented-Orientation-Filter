@@ -291,4 +291,4 @@ Matrix_3x13d sigmaOmegas(
 );
 
 }
-#endif
+#endif //USQUE_HPP

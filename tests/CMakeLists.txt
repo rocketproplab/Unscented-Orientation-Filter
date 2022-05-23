@@ -12,9 +12,16 @@ FetchContent_MakeAvailable(googletest)
 enable_testing()
 
 add_executable(Example example.cpp)
+add_executable(IdealGyroVals IdealGyroVals.cpp)
 target_link_libraries(Example 
 	PRIVATE gtest_main
 	PUBLIC Usque
 )
+
+target_link_libraries(IdealGyroVals 
+	PRIVATE gtest_main
+	PUBLIC Sim
+)
 include(GoogleTest)
 gtest_discover_tests(Example)
+gtest_discover_tests(IdealGyroVals)

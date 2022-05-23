@@ -1,16 +1,21 @@
 #ifndef SIMULATION_HPP
 #define SIMULATION_HPP
-#include <optional>
 #include <random>
+#include <string>
+#include <fstream>
+#include <functional>
 #include "utils.hpp"
 #include "usque.hpp"
+
+
 namespace Usque {
+
 /*
  * Simulation
  * This class contains parameters for creating a simulation of a rocket's
  * gyro and magnetometer readings. To use this class:
  *
- * 1. Construct a Simulation instance. To do this, use a SimBuilder.
+ * 1. Construct a Simulation instance. Set its parameters.
  * 2. Call `run()`, which will populate internal data structures with the
  *    simulation results. 
  * 3. Call `output()`, which will write to the specified file as in CSV format.
@@ -23,16 +28,16 @@ namespace Usque {
 class Simulation {
 private:
 /* Simulation parameters */
-	int rotTime = 5400;
-	int runTime = 32400;
-	int gyroDt = 10;
-	double sigmaBias = 3.1623e-10;
-	double sigmaNoise = 0.31623e-6;
-	double sigmaMag = 50e-9;
-	int a = 1;
-	int lambda = 1;
-	int f = 2 * (a + 1);
-	int iterations = runTime / gyroDt;
+	unsigned long rotTime; 
+	unsigned long runTime;
+	unsigned long gyroDt;
+	unsigned long iterations;
+	double sigmaBias;
+	double sigmaNoise;
+	double sigmaMag;
+	double a;
+	double lambda;
+	double f;
 	Eigen::Vector3d gyroBias; //Gyro bias
 	bool hasFinished;
 /* Randomness */
@@ -56,25 +61,73 @@ private:
 	std::vector<double> idealGyroVals; //Store "ideal" gyro values here. Triples.
 	std::vector<double> magVals;       //Store magnetic field readings. Triples.
 	std::vector<double> errorQuats;    //Store error quaternions here. Quats.
+/* Testing friends */
+#ifdef TESTING
+	friend UsqueTests::SimWrapper;
+#endif
 public:
 
 	/*
 	 * Initialize a simulation with default params.
-	 * TODO: What are default params?
+	 * rotTime = 5400 seconds
+	 * runTime = 32400 seconds
+	 * gyroDt  = 10 seconds
+	 * sigmaBias = 3.1623e-10 rad per s^(3/2)
+	 * sigmaNoise = 3.1623e-6 rad per s^(1/2)
+	 * sigmaMag = 50e-9 Tesla
+	 * a = 1 (0 <= a <= 1)
+	 * lambda = 1
+	 * f = 2 * (a + 1)
 	 */
 	Simulation();
 
-	void setParam();
+	//Don't want to allow copies
+	Simulation(Simulation& other) = delete;
+
+	//Don't want to allow moves
+	Simulation(Simulation&& other) = delete;
+
+	//Set the params.
+	void setParams(std::function<void(Simulation&)> builder);
 
 	/*
-	 * Runs the simulation. Not threadsafe.
+	 * Runs the simulation. Locks the state.
 	 */
 	void run();
 
 	/*
 	 * Outputs the data stored. Not threadsafe.
+	 * Delimiter is `,`, line delimiter is `\n`.
+	 * Note that carriage return (used by Windows) is `\r\n`!
 	 */
-	void output();
+	void output(std::string& filename);
+
+	/*
+	 * Outputs the data stored. Not threadsafe.
+	 * Delimiter is `,`, line delimiter is `\n`.
+	 * Note that carriage return (used by Windows) is `\r\n`!
+	 */
+	void output(const char* filename);
+
+	/*
+	 * Prints the output to stdout. Not threadsafe.
+	 * Mainly for use to pipe to another program.
+	 */
+	void printOutput();
+
+	/*
+	 * Outputs the data as a binary file. Each data line consists
+	 * of 15 8-byte blocks, followed by a `\n` to indicate the next
+	 * entry. No headers are included. The data is formatted like follows:
+	 * Iteration (8)
+	 * Time (8)
+	 * Ideal gyros (8 x 3)
+	 * Gyros (8 x 3)
+	 * Mags (8 x 3)
+	 * Errors (8 x 4)
+	 * newline (1)
+	 */
+	void binOutput();
 
 private:
 	
@@ -115,25 +168,6 @@ private:
 
 };
 
-/*
- * Use this class to build a simulation with appropriate params. 
- */
-class SimBuilder {
-public:
-	std::optional<int> rotTime;
-	std::optional<int> runTime;
-	std::optional<int> gyroDt;
-	std::optional<double> sigmaBias; 
-	std::optional<double> sigmaNoise;
-	std::optional<double> sigmaMag;
-	std::optional<int> a;
-	std::optional<int> lambda;
-	std::optional<int> f;
-	std::optional<int> iterations; 
-	std::optional<Eigen::Vector3d> gyroBias; //Gyro bias
-
-	Simulation build();
-};
 
 }
-#endif
+#endif //SIMULATION_HPP
