@@ -15,7 +15,7 @@ add_subdirectory(src/usque)
 add_subdirectory(src/simulation)
 #Unit tests
 # if(ENABLE_UNIT_TESTS) {
-	add_subdirectory(tests)
+	# add_subdirectory(tests)
 # }
 # Testbench
-# add_subdirectory(src/testbenches)
+add_subdirectory(src/testbenches)

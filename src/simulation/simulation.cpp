@@ -21,6 +21,9 @@ Simulation::Simulation() :
 	/* Construct gyro bias */
 	const double GB = (PI / 6.48) * 1e-5;
 	gyroBias << GB, GB, GB;
+	/* Initialize states */
+	rotVec << 1, 2, 3;
+	trueOrient << 0, 0, 0, 1;
 	/* Construct initial error */
 	error << 0, 0, 0, GB, GB, GB;
 	/* Construct covariance */
@@ -164,14 +167,14 @@ void Simulation::readWMM() {
 
 void Simulation::readGyro() {
 	//Generate a random bias.
-	this->bias += sigmaBias * Eigen::Vector3d::NullaryExpr(3, 3, [&](){return dis(gen);});
-	Eigen::Vector3d noise = sigmaNoise * Eigen::Vector3d::NullaryExpr(3, 3, [&](){return dis(gen);});
-	this->gyroMeas << idealAngV + bias + noise;
+	gyroBias += sigmaBias * Eigen::Vector3d::NullaryExpr(3, [&](){return dis(gen);});
+	Eigen::Vector3d noise = sigmaNoise * Eigen::Vector3d::NullaryExpr(3, [&](){return dis(gen);});
+	gyroMeas << idealAngV + gyroBias + noise;
 }
 
 void Simulation::readMag() {
 	//Generate noise
-	Eigen::Vector3d noise = sigmaMag * Eigen::Vector3d::NullaryExpr(3, 3, [&](){return dis(gen);}); 
+	Eigen::Vector3d noise = sigmaMag * Eigen::Vector3d::NullaryExpr(3, [&](){return dis(gen);}); 
 	Eigen::Vector4d worldQuat;
 	worldQuat << magField, 0;
 	Eigen::Vector4d idealMagMeas = multQuat(multQuat(invQuat(trueOrient), worldQuat), trueOrient);
@@ -179,8 +182,8 @@ void Simulation::readMag() {
 }
 
 void Simulation::gyroIntegrate() {
-	const double norm = gyroMeas.norm();
-	Eigen::Vector4d deltaQuat = rotQuat(gyroDt * norm, gyroMeas / (norm));
+	const double norm = idealAngV.norm();
+	Eigen::Vector4d deltaQuat = rotQuat(gyroDt * norm, idealAngV / (norm));
 	trueOrient = multQuat(trueOrient, deltaQuat);
 }
 

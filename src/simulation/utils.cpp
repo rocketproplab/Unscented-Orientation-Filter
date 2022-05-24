@@ -7,13 +7,13 @@ Eigen::Vector4d multQuat(
 	Eigen::Vector4d& q, 
 	Eigen::Vector4d& p
 ) {
-	double a = q(4) * p(4) - q(1) * p(1) - q(2) * p(2) - q(3) * p(3);
-	double b = q(4) * p(2) - q(1) * p(3) + q(2) * p(4) + q(3) * p(1);
-	double c = q(4) * p(3) + q(1) * p(2) - q(2) * p(1) + q(3) * p(4);
-	double d = q(4) * p(1) + q(1) * p(4) + q(2) * p(3) - q(3) * p(2);
+	double a = q(3) * p(3) - q(0) * p(0) - q(1) * p(1) - q(2) * p(2);
+	double b = q(3) * p(0) + q(0) * p(3) + q(1) * p(2) - q(2) * p(1);
+	double c = q(3) * p(1) - q(0) * p(2) + q(1) * p(3) + q(2) * p(0);
+	double d = q(3) * p(2) + q(0) * p(1) - q(1) * p(0) + q(2) * p(3);
  
 	Eigen::Vector4d result;
-	result << a, b, c, d;
+	result << b, c, d, a;
 	return result;
 }
 

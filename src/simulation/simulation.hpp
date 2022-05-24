@@ -53,7 +53,6 @@ private:
 	Eigen::Vector3d idealAngV; //The ideal orientation
 	Eigen::Vector4d trueOrient; //The real orientation
 	Eigen::Vector3d gyroMeas; //Current gyro reading
-	Eigen::Vector3d bias; //defined in readGyro.m; TODO: document better
 	Eigen::Vector3d magField; //magnetic field in WMM
 	Eigen::Vector3d magMeas; //Current magnetometer value
 /* Simulation records */

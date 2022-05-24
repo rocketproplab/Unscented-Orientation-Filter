@@ -54,9 +54,9 @@ Eigen::Matrix3d crossMatrix(
 	Eigen::Vector3d&     vec
 ) {
 	Eigen::Matrix3d result;
-	result <<         0, -vec(3,1),  vec(2,1),
-	           vec(3,1),         0, -vec(1,1), 
-			  -vec(2,1),  vec(1,1),         0;
+	result <<         0, -vec(2),  vec(1),
+	           vec(2),         0, -vec(0), 
+			  -vec(1),  vec(0),         0;
 	return result;
 }
 
