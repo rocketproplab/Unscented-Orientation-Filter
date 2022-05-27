@@ -7,19 +7,16 @@ namespace Usque {
  * 
  */
 Eigen::Matrix3d attitudeMatrix(Eigen::Vector4d& quat) {
-	Matrix_3x4d eps;
+	Matrix_4x3d eps;
 	Matrix_4x3d psi;
 	//Eq. 16a, expanded.
-	eps <<  quat(3),  quat(2), -quat(1), -quat(0),
-	       -quat(2),  quat(3),  quat(0), -quat(1),
-		    quat(1), -quat(0),  quat(3), -quat(2);
+	eps.block<3, 3>(0, 0) << quat(3) * Eigen::Matrix3d::Identity() + crossMatrix(quat.head<3>());
+	eps.block<1, 3>(3, 0) << -quat.head<3>().transpose();
 
 	//Eq. 16b, expanded.
-	psi <<  quat(3), -quat(2),  quat(1),
-	        quat(2),  quat(3), -quat(0),
-		   -quat(1),  quat(0),  quat(3),
-		   -quat(0), -quat(1), -quat(2);
-	return eps * psi;
+	psi.block<3, 3>(0, 0) << quat(3) * Eigen::Matrix3d::Identity() - crossMatrix(quat.head<3>());
+	psi.block<1, 3>(3, 0) << -quat.head<3>().transpose();
+	return eps.transpose() * psi;
 }
 
 Eigen::Matrix3d attitudeMatrix(
@@ -30,6 +27,7 @@ Eigen::Matrix3d attitudeMatrix(
 
 /*
  * crossCorr.m
+ * eq. 13
  */
 Matrix_6x3d crossCorr(
 	Matrix_6x13d& possNewError, //6x13
@@ -39,15 +37,17 @@ Matrix_6x3d crossCorr(
     const int lambda
 ) {
 	Matrix_6x3d covSum;
-	covSum << lambda * (possNewError.col(2 * SIZE) - predError) * 
-		(possExpMagMeas.col(2 * SIZE) - predMagMeas).transpose();
+	Vector6d termA = possNewError.col(2 * SIZE) - predError;
+	Eigen::Vector3d termB = possExpMagMeas.col(2 * SIZE) - predMagMeas;
+	covSum = lambda * termA * termB.transpose();
 	
 	for(int i = 0; i < 2 * SIZE; i++) {
-		covSum = covSum + (possNewError.col(i) - predError) * 
-			0.5*(possExpMagMeas.col(i) - predMagMeas).transpose();
+		Matrix_6x3d temp = (possNewError.col(i) - predError) * 
+			(possExpMagMeas.col(i) - predMagMeas).transpose() / 2;
+		covSum += temp;
 	}
-
-	return covSum/(SIZE + lambda);
+	covSum /= (SIZE + lambda);
+	return covSum;
 }
 
 Eigen::Matrix3d crossMatrix(
@@ -73,19 +73,17 @@ Eigen::Matrix3d innovationCov(
     Eigen::Matrix<double, 3, 2 * SIZE + 1>& possExpMagMeas, 
 	Eigen::Vector3d& predMagMeas,
     int lambda,
-    double sigma_mag
+    double sigmaMag
 ) {
 	Eigen::Matrix3d covSum;
-	covSum << lambda*(possExpMagMeas.col(2 * SIZE) - predMagMeas) * 
+	covSum = lambda*(possExpMagMeas.col(2 * SIZE) - predMagMeas) * 
 		(possExpMagMeas.col(2 * SIZE) - predMagMeas).transpose();
 	
 	for(int i = 0; i < 2*SIZE; i++) {
 		covSum = covSum + (possExpMagMeas.col(i) - predMagMeas) * 
 			0.5*(possExpMagMeas.col(i) - predMagMeas).transpose();
 	}
-
-	return covSum / (SIZE + lambda) + (sigma_mag*sigma_mag) * 
-		Eigen::Matrix3d::Identity();
+	return covSum / (SIZE + lambda) + (sigmaMag*sigmaMag) * Eigen::Matrix3d::Identity();
 }
 
 
@@ -156,7 +154,7 @@ Matrix_6x13d newChis(
 	// cerr << "dqK1 good" << endl;
 	Matrix_6x13d possNewError;
 	for(int i = 0; i < 2*SIZE; i++) {
-		possNewError.block(0,i,3,1) << f*dqK1.block(0,i,3,1)/(a+dqK1(3,i));
+		possNewError.block<3, 1>(0, i) << f*dqK1.block<3, 1>(0, i)/(a+dqK1(3,i));
 	}
 	// cerr << "step1 good" << endl;
 
@@ -173,8 +171,8 @@ Vector6d predictError(
 	Matrix_6x6d& noiseCov
 ) {
 	Vector6d predError;
-	predError << (lambda * possNewError.col(2*SIZE) + 0.5*possNewError.
-		leftCols(2 * SIZE).rowwise().sum())/(SIZE + lambda);
+	predError << (lambda * possNewError.col(2*SIZE) + 
+		0.5 * possNewError.leftCols(2 * SIZE).rowwise().sum())/(SIZE + lambda);
 	// cerr << "predError: " << endl << predError << endl;
 	return predError;
 }
@@ -240,11 +238,13 @@ Eigen::Vector4d quatUpdate(
 	const int a, 
 	Matrix_4x13d& possNewQuats
 ) {
-	Eigen::Vector4d update;
-	double fourVal = (-a * error.head(3).squaredNorm() + f * sqrt(f*f + 
-		(1- a * a) * error.head(3).squaredNorm())) / (f * f + 
-		error.head(3).squaredNorm());
-	update.head(3) << ((a + fourVal) / f)*error.head(3);
+	//Dq_+K1
+	Eigen::Vector4d update = Eigen::Vector4d::Zero();
+	double sqnorm = error.head<3>().squaredNorm();
+	double term2 = f * sqrt(f*f+(1-a*a)*sqnorm);
+	double bottom = (f*f+sqnorm);
+	double error4 = (-a * sqnorm + term2) / bottom;
+	update << ((a + error4) / f) * error.head<3>(), error4;
 
 	return kalmanArrayMult(update,possNewQuats.col(2 * SIZE));
 }
@@ -297,6 +297,7 @@ Matrix_6x13d chiValues(
 	Matrix_6x6d sigma = cholInput.llt().matrixL();
 	Matrix_6x13d chi;
 	chi << sigma, (-1*sigma), Vector6d::Zero();
+	//sigmaQuats.m:32
 	chi = chi + error.replicate<1, 2 * SIZE + 1>();
 	return chi;
 }
@@ -312,10 +313,14 @@ Matrix_4x13d quatDistribution(
 ) {
 	Matrix_4x13d dqK;
 	for(int i = 0; i < 2 * SIZE; i++) {
-		dqK(3,i) = (-a * chi.block(0,i,3,1).squaredNorm() + f * sqrt(f*f + 
-		(1-a*a)*chi.block(0,i,3,1).squaredNorm()))/(f*f + chi.block(0,i,3,1).
-			squaredNorm());
-		dqK.block(0,i,3,1) = ((a + dqK(3,i))/f)*chi.block(0,i,3,1);
+		Eigen::Vector3d chiBlock = chi.block<3, 1>(0, i);
+		//Eq. 33
+		double termA = -a * chiBlock.squaredNorm();
+		double termB = f * sqrt(f*f + (1 - a*a) * chiBlock.squaredNorm());
+		double lower = (f*f + chiBlock.squaredNorm());
+		double result = (termA + termB) / lower;
+		dqK(3, i) = result;
+		dqK.block<3, 1>(0, i) << ((a + result) / f) * chiBlock;
 	}
 	// cerr << "dqK: \n" << dqK << endl;
 	Eigen::Matrix<double, 4, 2 * SIZE + 1> possQuats;
@@ -326,6 +331,41 @@ Matrix_4x13d quatDistribution(
 	// cerr << "possQuats: " << endl << possQuats << endl;
 	return possQuats;
 }
+
+void updateError(
+	const Eigen::Vector3d& magMeas, 
+	const Eigen::Vector3d& predMagMeas,
+	const Matrix_6x3d& newCrossCorrelation,
+	const Eigen::Matrix3d& newInnovationCov,
+	const Vector6d& predError,
+	const Matrix_6x6d& predCov,
+	Vector6d& error,          
+	Matrix_6x6d& covariance   
+) {
+	//updateError.m: 27
+	Eigen::Vector3d vK1 = magMeas - predMagMeas;
+	//updateError.m: 31
+	//Implement matrix 'division'. Note that x = A/B means:
+	//solve linear system xB = A (solve for x).
+	//So here we have `gain = x`, `innovation = B`.
+	//Then we need to solve for `x`.
+	//Eigen solvers can only do Bx = A, so we use the property:
+	//    (xB)^T = (B^T)(x^T)
+	//Thus, we use
+	//    (xB)^T = (B^T)(x^T) = A^T
+	//Set z = (x^T). Then, we solve for z. To get x, use the property
+	//    (x^T)^T = x. So, (z^T) = (x^T)^T = x.
+	//Matrix_6x3d gain = newCrossCorrelation / newInnovationCov;
+	Matrix_3x6d At = newCrossCorrelation.transpose(); //A transpose
+	Eigen::Matrix3d Bt = newInnovationCov.transpose(); //B transpose
+	//Solve for z and transpose to get x.
+	Matrix_6x3d gain = Bt.colPivHouseholderQr().solve(At).transpose();
+	//runFilter.m: 257-258
+	error = predError + gain* vK1; // Generate new error
+	//updateError.m: 41
+	covariance = predCov - gain * newInnovationCov * gain.transpose(); // New cov
+}
+
 
 /*
  * runFilter.m
@@ -376,22 +416,20 @@ void filterStep(
 
 	//runFilter.m: 224
 	Eigen::Matrix3d newInnovationCov = innovationCov(possExpMagMeas, 
-		predMagMeas, lambda, sigmaMag).inverse();
+		predMagMeas, lambda, sigmaMag);
 
 	//runFilter.m: 229
 	Matrix_6x3d newCrossCorrelation = crossCorr(possNewError, predError,
 		possExpMagMeas, predMagMeas, lambda);
-
-	//updateError.m: 27
-	Eigen::Vector3d innovation = magMeas - predMagMeas;
-	//updateError.m: 31
-	Matrix_6x3d gain = newCrossCorrelation * 
-		newInnovationCov;
-	//runFilter.m: 257-258
-	error = predError + gain*innovation; // Generate new error
-
-	//updateError.m: 41
-	covariance = predCov - gain * newInnovationCov * gain.transpose(); // New cov
+	//runFilter.m: 241
+	updateError(magMeas,
+	            predMagMeas, 
+	            newCrossCorrelation, 
+	            newInnovationCov, 
+	            predError, 
+	            predCov, 
+	            error, 
+	            covariance);
 	//runFilter.m: 251
 	attitudeQuat = quatUpdate(error, f, a, possNewQuats); // new attitudeQuat
 	//runFilter.m: 266

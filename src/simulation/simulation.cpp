@@ -24,6 +24,7 @@ Simulation::Simulation() :
 	/* Initialize states */
 	rotVec << 1, 2, 3;
 	trueOrient << 0, 0, 0, 1;
+	attitudeQuat << 0, 0, 0, 1;
 	/* Construct initial error */
 	error << 0, 0, 0, GB, GB, GB;
 	/* Construct covariance */

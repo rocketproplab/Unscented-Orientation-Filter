@@ -290,5 +290,16 @@ Matrix_3x13d sigmaOmegas(
 	Matrix_6x13d&        chi
 );
 
+void updateError(
+	const Eigen::Vector3d& magMeas, 
+	const Eigen::Vector3d& predMagMeas,
+	const Matrix_6x3d& newCrossCorrelation,
+	const Eigen::Matrix3d& newInnovationCov,
+	const Vector6d& predError,
+	const Matrix_6x6d& predCov,
+	Vector6d& error,          
+	Matrix_6x6d& covariance   
+);
+
 }
 #endif //USQUE_HPP
