@@ -42,6 +42,9 @@ Simulation::Simulation() :
 	idealGyroVals.reserve(3 * iterations);
 	magVals.reserve(3 * iterations);
 	errorQuats.reserve(4 * iterations);
+	/* Randomness initialization */
+	rng.seed(0);//Set the seed of the random number generator.
+
 }
 
 void Simulation::run() {
@@ -168,14 +171,14 @@ void Simulation::readWMM() {
 
 void Simulation::readGyro() {
 	//Generate a random bias.
-	gyroBias += sigmaBias * Eigen::Vector3d::NullaryExpr(3, [&](){return dis(gen);});
-	Eigen::Vector3d noise = sigmaNoise * Eigen::Vector3d::NullaryExpr(3, [&](){return dis(gen);});
-	gyroMeas << idealAngV + gyroBias + noise;
+	gyroBias += sigmaBias * Eigen::Vector3d::NullaryExpr(3, [&](){return 5 * dis(rng);});
+	Eigen::Vector3d noise = sigmaNoise * Eigen::Vector3d::NullaryExpr(3, [&](){return 5 * dis(rng);});
+	gyroMeas = idealAngV + gyroBias + noise;
 }
 
 void Simulation::readMag() {
 	//Generate noise
-	Eigen::Vector3d noise = sigmaMag * Eigen::Vector3d::NullaryExpr(3, [&](){return dis(gen);}); 
+	Eigen::Vector3d noise = sigmaMag * Eigen::Vector3d::NullaryExpr(3, [&](){return 5 * dis(rng);}); 
 	Eigen::Vector4d worldQuat;
 	worldQuat << magField, 0;
 	Eigen::Vector4d idealMagMeas = multQuat(multQuat(invQuat(trueOrient), worldQuat), trueOrient);

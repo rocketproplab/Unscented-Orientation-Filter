@@ -40,10 +40,11 @@ private:
 	double f;
 	Eigen::Vector3d gyroBias; //Gyro bias
 	bool hasFinished;
-/* Randomness */
-	std::random_device rd;
-	std::mt19937 gen;
-	std::uniform_real_distribution<double> dis;
+/* Randomness 
+ * https://en.cppreference.com/w/cpp/numeric/random/mersenne_twister_engine
+ */
+	std::mt19937 rng;
+	std::normal_distribution<double> dis;
 /* Simulation variables */
 	Usque::Matrix_6x6d covariance; //Covariance matrix
 	Usque::Matrix_6x6d noiseCov; //Noise cov
